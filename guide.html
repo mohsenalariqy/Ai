@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>دليل البداية السريعة — مساعد التسويق الذكي</title>
+<meta name="description" content="خطوات تشغيل مساعد التسويق الذكي في دقيقتين: إنشاء المفتاح المجاني ولصقه في التطبيق.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0b1f3a; --navy-2:#12294b; --navy-3:#1a3560;
+  --gold:#d4af37; --gold-2:#b9952e;
+  --bg:#f6f4ee; --card:#ffffff; --ink:#1c2733; --muted:#6b7686;
+  --border:#e6e1d4; --ok:#2e7d4f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.9}
+header{
+  background:linear-gradient(135deg,var(--navy),var(--navy-2));
+  color:#fff;padding:28px 18px;text-align:center;border-bottom:3px solid var(--gold);
+}
+header .star{font-size:36px}
+header h1{font-size:23px;font-weight:800;margin:6px 0 4px}
+header p{color:#c9d4e6;font-size:14.5px}
+main{max-width:640px;margin:0 auto;padding:18px 14px 40px;display:flex;flex-direction:column;gap:16px}
+.intro{
+  background:#fbf7ea;border:1px dashed var(--gold);border-radius:14px;
+  padding:14px 16px;text-align:center;font-weight:700;color:#5b4d1e;font-size:15.5px;
+}
+.step{
+  background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:18px;box-shadow:0 1px 4px rgba(11,31,58,.05);
+}
+.step-head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.num{
+  width:38px;height:38px;border-radius:50%;flex:0 0 auto;
+  background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--navy);
+  font-weight:800;font-size:18px;display:flex;align-items:center;justify-content:center;
+}
+.step h2{font-size:18px;color:var(--navy);font-weight:800}
+.step p{font-size:15px;color:var(--ink)}
+.step ul{padding-right:20px;margin-top:6px;font-size:15px}
+.step li{margin-bottom:4px}
+.step b{color:var(--navy)}
+.linkbox{
+  display:block;background:#fbf7ea;border:1px solid #eadfc0;border-radius:12px;
+  padding:10px 14px;margin-top:10px;color:var(--gold-2);font-weight:700;font-size:14.5px;
+  word-break:break-all;text-decoration:none;direction:ltr;text-align:center;
+}
+.mock{
+  background:var(--bg);border:1.5px solid var(--border);border-radius:14px;
+  padding:14px;margin-top:12px;font-size:14px;
+}
+.mock .title{color:var(--muted);font-size:12px;margin-bottom:8px;text-align:center}
+.mock .card{
+  background:#fff;border:1px solid var(--border);border-top:3px solid var(--gold);
+  border-radius:12px;padding:10px 12px;margin-bottom:8px;
+}
+.mock .btn{
+  display:inline-block;background:linear-gradient(135deg,var(--navy),var(--navy-3));
+  color:#fff;border-radius:10px;padding:6px 18px;font-weight:800;font-size:13.5px;
+}
+.mock .btn-gold{background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--navy)}
+.mock .field{
+  border:1.5px solid var(--border);border-radius:10px;padding:8px 10px;color:var(--muted);
+  background:#fff;font-size:13px;margin:6px 0;
+}
+.mock .okline{color:var(--ok);font-weight:700;font-size:13px}
+.mock .bubble{
+  background:linear-gradient(135deg,var(--navy),var(--navy-3));color:#fff;
+  border-radius:12px;border-bottom-left-radius:4px;padding:8px 12px;
+  max-width:85%;margin-bottom:8px;font-size:13.5px;
+}
+.mock .bubble2{
+  background:#fff;border:1px solid var(--border);border-top:3px solid var(--gold);
+  border-radius:12px;border-bottom-right-radius:4px;padding:8px 12px;
+  max-width:85%;margin-right:auto;font-size:13.5px;
+}
+.faq{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:6px 18px}
+.faq details{border-bottom:1px solid var(--border);padding:12px 0}
+.faq details:last-child{border-bottom:none}
+.faq summary{font-weight:800;color:var(--navy);font-size:15.5px;cursor:pointer;list-style:none}
+.faq summary:before{content:"＋ ";color:var(--gold-2)}
+.faq details[open] summary:before{content:"− "}
+.faq details p{margin-top:6px;font-size:14.5px;color:var(--ink)}
+.done{
+  background:linear-gradient(135deg,var(--navy),var(--navy-3));color:#fff;
+  border-radius:16px;padding:20px;text-align:center;border-top:3px solid var(--gold);
+}
+.done h2{font-size:19px;margin-bottom:6px}
+.done p{font-size:14.5px;color:#c9d4e6}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="star">✦</div>
+  <h1>دليل البداية السريعة</h1>
+  <p>مساعد التسويق الذكي — شغّال معك خلال دقيقتين</p>
+</header>
+
+<main>
+  <div class="intro">أربع خطوات فقط، تسويها مرة وحدة أول مرة — وبعدها التطبيق جاهز دائمًا.</div>
+
+  <div class="step">
+    <div class="step-head"><div class="num">1</div><h2>افتح رابط التطبيق</h2></div>
+    <p>افتح الرابط اللي وصلك من مقدم الخدمة في متصفح جوالك (كروم أو سفاري).</p>
+    <div class="mock">
+      <div class="title">بتشوف واجهة التطبيق بهذا الشكل:</div>
+      <div class="card" style="text-align:center;color:var(--navy);font-weight:800">✦ مساعد التسويق الذكي</div>
+      <div class="bubble">منشور انستجرام عن محل حلا وتمر</div>
+      <div class="bubble2">يا هلا بالحلا الأصلي... ✨</div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="num">2</div><h2>صفحة الإعدادات بتفتح لحالها</h2></div>
+    <p>أول مرة تفتح التطبيق، بتطلع لك صفحة الإعدادات تلقائيًا. اضغط الرابط الذهبي داخلها:</p>
+    <a class="linkbox" href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a>
+    <div class="mock">
+      <div class="title">صفحة الإعدادات داخل التطبيق:</div>
+      <div class="card">
+        <b style="color:var(--navy)">⚙ الإعدادات</b>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">مزود الذكاء الاصطناعي: Google Gemini</div>
+        <div class="field" style="direction:ltr;text-align:left">aistudio.google.com/app/apikey</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="num">3</div><h2>سوّ مفتاحك المجاني من جوجل</h2></div>
+    <ul>
+      <li>سجل دخولك بحساب قوقل (نفس جيميلك العادي).</li>
+      <li>اضغط زر <b>إنشاء مفتاح API</b> (Create API key).</li>
+      <li>اختر مشروعًا جديدًا واضغط <b>إنشاء</b>.</li>
+      <li>بيطلع لك مفتاح طويل يبدأ بـ <b style="direction:ltr;display:inline-block">AIza...</b> — اضغط <b>نسخ</b>.</li>
+    </ul>
+    <p style="margin-top:8px;color:var(--muted);font-size:14px">المفتاح مجاني ١٠٠٪ من جوجل، وما يطلبون منك أي بطاقة أو دفع.</p>
+  </div>
+
+  <div class="step">
+    <div class="step-head"><div class="num">4</div><h2>الصق المفتاح واضغط حفظ</h2></div>
+    <p>ارجع للتطبيق، الصق المفتاح في خانة "مفتاح API" واضغط <b>حفظ</b>. بتطلع لك علامة ✓ خضراء — وخلاص، ابدأ اطلب أول منشور أو فكرة ريلز.</p>
+    <div class="mock">
+      <div class="title">بهذا الشكل:</div>
+      <div class="card">
+        <div class="field" style="direction:ltr;text-align:left">AIzaSy••••••••••••</div>
+        <div class="okline">✓ يوجد مفتاح محفوظ في جهازك</div>
+        <div style="text-align:left;margin-top:8px"><span class="btn">حفظ</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="done">
+    <h2>مبروك، التطبيق جاهز 🎉</h2>
+    <p>اكتب وش تحتاج لنشاطك — منشور، فكرة ريلز، خطة محتوى — وبيجيك جاهز باللهجة السعودية. المحتوى مولّد بالذكاء الاصطناعي، راجعه قبل النشر.</p>
+  </div>
+
+  <div class="faq">
+    <details>
+      <summary>هل المفتاح مجاني فعلاً؟</summary>
+      <p>نعم، ١٠٠٪. جوجل تعطي كل حساب حصة مجانية يومية تكفي للاستخدام الطبيعي، وما تطلب بطاقة ولا اشتراك.</p>
+    </details>
+    <details>
+      <summary>ليش أسوي المفتاح بنفسي؟</summary>
+      <p>عشان كل مستخدم يشتغل على حصته المجانية الخاصة. كذا التطبيق يظل شغال للجميع بدون ما يدفع أحد عن أحد.</p>
+    </details>
+    <details>
+      <summary>وين ينحفظ مفتاحي؟ هل هو آمن؟</summary>
+      <p>ينحفظ في متصفح جهازك فقط، وما يُرسل لأي جهة غير جوجل وقت توليد المحتوى.</p>
+    </details>
+    <details>
+      <summary>طلعت لي رسالة "وصلت للحد المجاني"؟</summary>
+      <p>هذا يعني أنك استخدمت حصتك مؤقتًا. انتظر دقيقة وجرب مرة ثانية — وإذا تكرر كثير، ارجع له بعد ساعة.</p>
+    </details>
+    <details>
+      <summary>ضاع مني المفتاح أو غيرت جهازي؟</summary>
+      <p>سوّ مفتاحًا جديدًا بنفس الخطوات (الخطوة ٢ و٣) والصقه من جديد. المفتاح القديم ما تحتاجه.</p>
+    </details>
+  </div>
+</main>
+
+<footer>مساعد التسويق الذكي ✦ دليل العميل</footer>
+
+</body>
+</html>
