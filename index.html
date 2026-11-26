@@ -56,12 +56,19 @@ header .spacer{flex:1}
 .icon-btn:hover{background:rgba(255,255,255,.18)}
 
 /* ===== Mode bar ===== */
-#modebar{display:flex;gap:8px}
+#modebar{display:flex;gap:8px;flex-wrap:wrap}
+.mode-btn{min-width:105px}
 .mode-btn{
   flex:1;padding:10px 8px;border-radius:12px;border:1.5px solid var(--border);
   background:#fff;font-weight:800;font-size:14.5px;color:var(--muted);transition:all .15s;
 }
 .mode-btn.active{border-color:var(--gold);color:var(--navy);background:#fbf7ea;box-shadow:0 1px 4px rgba(185,149,46,.2)}
+
+/* ===== Carousel ===== */
+.cr-strip{display:flex;gap:10px;overflow-x:auto;padding:4px 2px;-webkit-overflow-scrolling:touch}
+.cr-strip img{width:230px;flex:0 0 auto;border-radius:12px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(11,31,58,.12)}
+.cr-dls{flex-wrap:wrap;justify-content:flex-start}
+.cr-dls .d-download{padding:9px 14px;font-size:13.5px}
 
 /* ===== Chat area ===== */
 main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:16px 14px 8px;display:flex;flex-direction:column;gap:14px}
@@ -259,6 +266,7 @@ footer{
     <button class="mode-btn" id="modeGoogle">🔍 تسويق جوجل</button>
     <button class="mode-btn" id="modeDesigns">🎨 التصاميم</button>
     <button class="mode-btn" id="modeLanding">🚀 صفحة هبوط</button>
+    <button class="mode-btn" id="modeCarousel">🎠 كاروسيل</button>
   </div>
 
   <div id="empty">
@@ -349,6 +357,31 @@ footer{
       </div>
     </div>
     <div class="d-note">صفحتك تُولّد بالذكاء الاصطناعي بهوية كحلي وذهبي — راجعها قبل المشاركة. الرابط المنشور يبقى فعالًا ٣٠ يومًا.</div>
+  </div>
+
+  <div id="carousel" style="display:none">
+    <div class="d-card">
+      <div class="field" style="margin-top:0">
+        <label>موضوع الكاروسيل</label>
+        <textarea id="crTopic" rows="3" placeholder="مثال: عرض منتجات متجري الجديدة على سلة — عطور وبخور مع توصيل سريع"></textarea>
+      </div>
+      <div class="field">
+        <label>اسم المتجر (اختياري)</label>
+        <input id="crStore" placeholder="مثال: متجر النخبة" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>زر الواتساب في الشريحة الأخيرة (اختياري)</label>
+        <input id="crWa" placeholder="مثال: اطلب الآن واتساب 0500000000" autocomplete="off">
+      </div>
+      <button class="d-generate" id="crGen">🎠 ولّد الكاروسيل</button>
+      <div class="d-status" id="crStatus"></div>
+      <div class="d-counter" id="crCounter">الكاروسيل مجاني ضمن الحد اليومي</div>
+    </div>
+    <div class="d-result" id="crResult" style="display:none">
+      <div class="cr-strip" id="crStrip"></div>
+      <div class="d-actions cr-dls" id="crDownloads"></div>
+    </div>
+    <div class="d-note">٥ شرائح مترابطة بمحتوى مكتوب بالذكاء الاصطناعي ومصممة بهويتك — حمّلها وانشرها مباشرة على انستجرام. راجع النصوص قبل النشر.</div>
   </div>
 </main>
 
@@ -657,17 +690,20 @@ function setView(v){
   const isChat = v === 'chat';
   $('designs').style.display = v === 'designs' ? 'flex' : 'none';
   $('landing').style.display = v === 'landing' ? 'flex' : 'none';
+  $('carousel').style.display = v === 'carousel' ? 'flex' : 'none';
   chatEl.style.display = isChat ? 'flex' : 'none';
   chipsEl.style.display = isChat ? 'flex' : 'none';
   emptyEl.style.display = isChat ? (messages.length ? 'none' : 'block') : 'none';
   document.querySelector('footer').style.display = isChat ? '' : 'none';
   $('modeDesigns').classList.toggle('active', v === 'designs');
   $('modeLanding').classList.toggle('active', v === 'landing');
+  $('modeCarousel').classList.toggle('active', v === 'carousel');
   $('modeSocial').classList.toggle('active', isChat && mode === 'social');
   $('modeGoogle').classList.toggle('active', isChat && mode === 'google');
 }
 $('modeDesigns').onclick = () => setView('designs');
 $('modeLanding').onclick = () => setView('landing');
+$('modeCarousel').onclick = () => setView('carousel');
 
 /* ---- markdown (safe subset: escape first, then format) ---- */
 function mdRender(src){
@@ -1193,6 +1229,181 @@ $('lpCopy').onclick = () => {
   navigator.clipboard.writeText($('lpLink').value).then(() => toast('تم نسخ الرابط ✓')).catch(() => toast('تعذر النسخ'));
 };
 
+/* ---- carousel builder ---- */
+let crBusy = false;
+function crStatus(t){ $('crStatus').textContent = t; }
+
+function crParseSlides(text){
+  let t = (text || '').trim().replace(/^```[a-zA-Z]*\s*/, '').replace(/```\s*$/, '').trim();
+  const s = t.indexOf('['), e = t.lastIndexOf(']');
+  if(s < 0 || e <= s) return null;
+  let arr = null;
+  try{ arr = JSON.parse(t.slice(s, e + 1)); }catch(err){ return null; }
+  if(!Array.isArray(arr)) return null;
+  const slides = arr.filter(o => o && typeof o.title === 'string' && typeof o.body === 'string')
+    .map(o => ({title: o.title.trim().slice(0, 60), body: o.body.trim().slice(0, 160)}))
+    .filter(o => o.title && o.body);
+  return slides.length >= 3 ? slides.slice(0, 7) : null;
+}
+
+async function composeCarousel(bgBase64, slides, opts){
+  const W = 1080, H = 1080;
+  try{ await Promise.all([document.fonts.load('800 76px Tajawal'), document.fonts.load('500 42px Tajawal'), document.fonts.ready]); }catch(e){}
+  let bgImg = null;
+  if(bgBase64){
+    bgImg = await new Promise((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i); i.onerror = rej;
+      i.src = 'data:image/jpeg;base64,' + bgBase64;
+    });
+  }
+  const out = [];
+  for(let idx = 0; idx < slides.length; idx++){
+    const slide = slides[idx];
+    const last = idx === slides.length - 1;
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const x = c.getContext('2d');
+    if(bgImg){
+      const s = Math.max(W / bgImg.width, H / bgImg.height);
+      const dw = bgImg.width * s, dh = bgImg.height * s;
+      x.drawImage(bgImg, (W - dw) / 2, (H - dh) / 2, dw, dh);
+      x.fillStyle = 'rgba(11,31,58,0.58)'; x.fillRect(0, 0, W, H);
+    } else {
+      const g = x.createLinearGradient(0, 0, W, H);
+      g.addColorStop(0, '#0b1f3a'); g.addColorStop(1, '#123055');
+      x.fillStyle = g; x.fillRect(0, 0, W, H);
+      x.fillStyle = 'rgba(212,175,55,0.07)';
+      x.beginPath(); x.arc(W * 0.85, H * 0.15, 260, 0, 7); x.fill();
+      x.beginPath(); x.arc(W * 0.12, H * 0.88, 200, 0, 7); x.fill();
+    }
+    dRoundRect(x, 34, 34, W - 68, H - 68, 30);
+    x.strokeStyle = 'rgba(212,175,55,0.85)'; x.lineWidth = 4; x.stroke();
+    x.direction = 'rtl'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    if(opts.store){
+      x.fillStyle = '#d4af37';
+      x.font = '800 40px Tajawal';
+      x.fillText(opts.store, W / 2, 108);
+    }
+    const dotY = opts.store ? 168 : 118;
+    const dotGap = 34, dotW = (slides.length - 1) * dotGap;
+    for(let d = 0; d < slides.length; d++){
+      x.beginPath();
+      x.arc(W / 2 - dotW / 2 + d * dotGap, dotY, d === idx ? 9 : 6, 0, 7);
+      x.fillStyle = d === idx ? '#d4af37' : 'rgba(212,175,55,0.35)';
+      x.fill();
+    }
+    x.fillStyle = '#ffffff';
+    x.font = '800 74px Tajawal';
+    dWrapText(x, slide.title, W / 2, H * 0.40, W - 220, 104);
+    x.fillStyle = 'rgba(255,255,255,0.92)';
+    x.font = '500 42px Tajawal';
+    dWrapText(x, slide.body, W / 2, H * 0.62, W - 240, 72);
+    if(last && opts.wa){
+      const waH = 84, bw = Math.round(W * 0.72);
+      const bx = (W - bw) / 2, by = H - 190 - waH;
+      dRoundRect(x, bx, by, bw, waH, waH / 2);
+      x.fillStyle = '#d4af37'; x.fill();
+      x.fillStyle = '#0b1f3a';
+      x.font = '800 36px Tajawal';
+      x.fillText(opts.wa, W / 2, by + waH / 2 + 2);
+    }
+    x.fillStyle = 'rgba(255,255,255,0.55)';
+    x.font = '500 30px Tajawal';
+    x.fillText((idx + 1) + ' / ' + slides.length, W / 2, H - 78);
+    out.push(c.toDataURL('image/png'));
+  }
+  return out;
+}
+
+async function crGenerate(){
+  if(crBusy) return;
+  const topic = $('crTopic').value.trim();
+  if(!topic){ toast('اكتب موضوع الكاروسيل أولاً'); $('crTopic').focus(); return; }
+  if(!effectiveKey()){ openSettings(); toast('أضف مفتاح API المجاني أولاً'); return; }
+  crBusy = true;
+  const btn = $('crGen'); btn.disabled = true;
+  try{
+    crStatus('⏳ جاري كتابة محتوى الشرائح...');
+    const sys = 'أنت كاتب كاروسيلات انستجرام احترافية لأصحاب المتاجر الإلكترونية (سلة وغيرها). أخرج JSON فقط: مصفوفة من 5 عناصر بالشكل [{"title":"...","body":"..."}] بدون أي نص خارج ال JSON وبدون markdown. الشريحة الأولى هوك قوي يوقف التمرير، الوسطى فوائد ومميزات قصيرة، الأخيرة دعوة للطلب عبر الواتساب. كل title حتى 6 كلمات، وكل body حتى 20 كلمة. عربية بيضاء مفهومة في كل الدول، بدون ذكر أسعار إطلاقًا.';
+    const usr = 'موضوع الكاروسيل: ' + topic;
+    const key = effectiveKey();
+    const models = PROVIDERS.gemini.models;
+    let slides = null, lastStatus = 0;
+    for(let i = 0; i < models.length && !slides; i++){
+      const mdl = models[i];
+      const url = key === '__proxy__'
+        ? PROXY_URL + '/v1beta/models/' + mdl + ':generateContent'
+        : 'https://generativelanguage.googleapis.com/v1beta/models/' + mdl + ':generateContent?key=' + encodeURIComponent(key);
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 60000);
+      let res, bodyText = '';
+      try{
+        res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, signal: ctrl.signal,
+          body: JSON.stringify({system_instruction:{parts:[{text:sys}]}, contents:[{role:'user',parts:[{text:usr}]}], generationConfig:{temperature:0.8, maxOutputTokens:2048}})});
+        bodyText = await res.text();
+      }catch(e){ clearTimeout(t); lastStatus = 503; continue; }
+      clearTimeout(t);
+      lastStatus = res.status;
+      if(!res.ok){ if(res.status === 429 || res.status === 503) continue; break; }
+      let json = null;
+      try{ json = JSON.parse(bodyText); }catch(e){}
+      const out = json ? extractText('gemini', json) : '';
+      slides = crParseSlides(out);
+    }
+    if(!slides){
+      crStatus('');
+      toast(errorMessage(lastStatus || 503, 'gemini', '', usingOwnKey()));
+      return;
+    }
+    crStatus('🎨 جاري تجهيز خلفية التصميم...');
+    let bg = null;
+    try{
+      const ctrl2 = new AbortController();
+      const t2 = setTimeout(() => ctrl2.abort(), 90000);
+      const res2 = await fetch(PROXY_URL + '/image', {method:'POST', headers:{'Content-Type':'application/json'}, signal: ctrl2.signal,
+        body: JSON.stringify({prompt: 'luxury elegant abstract background for a social media carousel, deep navy blue with subtle gold geometric accents and soft light, premium minimal style, large empty center area, no text, no letters, no logos'})});
+      clearTimeout(t2);
+      const j2 = res2.ok ? await res2.json().catch(() => null) : null;
+      if(j2 && j2.image){
+        bg = j2.image;
+        if(typeof j2.remaining === 'number') $('crCounter').textContent = 'يبقى ' + j2.remaining + ' تصميم اليوم';
+      }
+    }catch(e){}
+    if(!bg) $('crCounter').textContent = 'حصة التصاميم خلصت اليوم — استخدمنا خلفية الهوية';
+    crStatus('✍️ جاري تركيب الشرائح...');
+    const dataUrls = await composeCarousel(bg, slides, {
+      store: $('crStore').value.trim(),
+      wa: $('crWa').value.trim()
+    });
+    const strip = $('crStrip');
+    strip.innerHTML = '';
+    const dls = $('crDownloads');
+    dls.innerHTML = '';
+    const stamp = Date.now();
+    dataUrls.forEach((u, i) => {
+      const img = document.createElement('img');
+      img.src = u; img.alt = 'شريحة ' + (i + 1);
+      strip.appendChild(img);
+      const a = document.createElement('a');
+      a.className = 'd-download';
+      a.href = u;
+      a.download = 'carousel-' + stamp + '-' + (i + 1) + '.png';
+      a.textContent = '⬇ شريحة ' + (i + 1);
+      dls.appendChild(a);
+    });
+    $('crResult').style.display = 'block';
+    $('crResult').scrollIntoView({behavior:'smooth', block:'start'});
+    crStatus('');
+    toast('الكاروسيل جاهز ✓ ' + slides.length + ' شرائح');
+  }catch(e){
+    crStatus('');
+    toast('صار خطأ غير متوقع — جرب مرة ثانية');
+  }finally{
+    crBusy = false; btn.disabled = false;
+  }
+}
+$('crGen').onclick = crGenerate;
+
 /* ---- settings ---- */
 function openSettings(){
   keyInput.value = settings.key;
@@ -1265,7 +1476,7 @@ $('newChatBtn').onclick = () => {
   render();
   if(HAS_EMBEDDED) keyHint.style.display = 'none';
   const savedView = localStorage.getItem('mt_view');
-  if(savedView === 'designs' || savedView === 'landing') setView(savedView);
+  if(savedView === 'designs' || savedView === 'landing' || savedView === 'carousel') setView(savedView);
   if(!effectiveKey()) setTimeout(openSettings, 600);
 })();
 }
