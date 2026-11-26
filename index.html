@@ -275,8 +275,8 @@ footer{
 const PROVIDERS = {
   gemini: {
     name: 'Google Gemini',
-    models: ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'],
-    defaultModel: 'gemini-2.5-flash'
+    models: ['gemini-3.8-flash', 'gemini-3.6-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite'],
+    defaultModel: 'gemini-3.8-flash'
   },
   groq: {
     name: 'Groq',
@@ -363,6 +363,7 @@ function extractText(provider, json){
 }
 
 function errorMessage(status, provider, bodyText){
+  if(status === 404 && provider === 'gemini') return 'النموذج المختار غير متاح لمفتاحك. افتح الإعدادات ⚙ واختر نموذجًا آخر من القائمة وجرب مرة ثانية.';
   if(status === 400 && provider === 'gemini') return 'المفتاح غير صحيح أو غير مكتمل. تأكد من نسخه كاملًا من الإعدادات ⚙';
   if(status === 401 || status === 403) return 'المفتاح مرفوض. تأكد أنه صحيح وفعّال من صفحة الإعدادات ⚙';
   if(status === 429) return 'وصلت للحد المجاني مؤقتًا. انتظر دقيقة وجرب مرة ثانية.';
@@ -390,11 +391,14 @@ let messages = loadChat();
 let busy = false;
 
 function loadSettings(){
-  return {
+  const s = {
     provider: localStorage.getItem(LS.provider) || 'gemini',
     key: localStorage.getItem(LS.key) || '',
     model: localStorage.getItem(LS.model) || ''
   };
+  if(!PROVIDERS[s.provider]) s.provider = 'gemini';
+  if(s.model && !PROVIDERS[s.provider].models.includes(s.model)) s.model = '';
+  return s;
 }
 function saveSettings(){
   localStorage.setItem(LS.provider, settings.provider);
