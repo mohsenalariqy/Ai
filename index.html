@@ -423,12 +423,13 @@ function extractText(provider, json){
   return '';
 }
 
-function errorMessage(status, provider, bodyText){
-  if(status === 404 && provider === 'gemini') return 'النموذج المختار غير متاح لمفتاحك. افتح الإعدادات ⚙ واختر نموذجًا آخر من القائمة وجرب مرة ثانية.';
-  if(status === 400 && provider === 'gemini') return 'المفتاح غير صحيح أو غير مكتمل. تأكد من نسخه كاملًا من الإعدادات ⚙';
-  if(status === 401 || status === 403) return 'المفتاح مرفوض. تأكد أنه صحيح وفعّال من صفحة الإعدادات ⚙';
-  if(status === 429) return 'وصلت للحد المجاني مؤقتًا. انتظر دقيقة وجرب مرة ثانية.';
-  if(status >= 500) return 'خدمة الذكاء الاصطناعي مشغولة حاليًا. جرب بعد قليل.';
+function errorMessage(status, provider, bodyText, ownKey){
+  const busyMsg = 'خدمة الذكاء الاصطناعي مشغولة حاليًا بسبب الضغط. انتظر دقيقة وجرب مرة ثانية.';
+  if(status === 404 && provider === 'gemini') return ownKey ? 'النموذج المختار غير متاح لمفتاحك. افتح الإعدادات ⚙ واختر نموذجًا آخر من القائمة وجرب مرة ثانية.' : busyMsg;
+  if(status === 400 && provider === 'gemini') return ownKey ? 'المفتاح غير صحيح أو غير مكتمل. تأكد من نسخه كاملًا من الإعدادات ⚙' : 'صار خلل مؤقت بالخدمة. جرب مرة ثانية بعد قليل.';
+  if(status === 401 || status === 403) return ownKey ? 'المفتاح مرفوض. تأكد أنه صحيح وفعّال من صفحة الإعدادات ⚙' : 'خدمة الذكاء الاصطناعي موقّفة مؤقتًا. جرب بعد قليل ونكون جاهزين.';
+  if(status === 429) return 'انتهت الحصة المجانية مؤقتًا. انتظر دقيقة وجرب مرة ثانية.';
+  if(status >= 500) return busyMsg;
   return 'صار خطأ غير متوقع (رمز ' + status + '). جرب مرة ثانية.';
 }
 
@@ -440,7 +441,7 @@ if(typeof module !== 'undefined' && module.exports){
 /* ================= App (DOM) ================= */
 if(typeof document !== 'undefined'){
 
-const LS = {provider:'mt_provider', key:'mt_apikey', model:'mt_model', mode:'mt_mode', chatPrefix:'mt_chat_'};
+const LS = {provider:'mt_provider', key:'mt_apikey', model:'mt_model', mode:'mt_mode', useOwn:'mt_useown', chatPrefix:'mt_chat_'};
 /* Zero-setup: requests go through a Cloudflare Worker proxy that holds the Gemini
    key as a server-side secret (never in this file) and only answers our domain.
    Visitors can still add their own free key in Settings; a saved key always wins. */
@@ -481,8 +482,14 @@ function saveChat(){
 function currentModel(){
   return settings.model || PROVIDERS[settings.provider].defaultModel;
 }
+/* A saved key only wins when the user explicitly chose "use my own key" after
+   the proxy era (mt_useown flag set by the Save button). Legacy saved keys from
+   before the proxy never override it, so a stale/invalid key on the device can't
+   break the zero-setup experience. */
+function usingOwnKey(){ return localStorage.getItem(LS.useOwn) === '1' && !!settings.key; }
 function effectiveKey(){
-  return settings.key || (HAS_EMBEDDED ? '__proxy__' : '');
+  if(usingOwnKey()) return settings.key;
+  return HAS_EMBEDDED ? '__proxy__' : (settings.key || '');
 }
 
 /* ---- mode switching ---- */
@@ -586,7 +593,7 @@ async function send(){
       if(res.ok || (res.status !== 429 && res.status !== 503)) break;
     }
     if(!res.ok){
-      let msg = errorMessage(res.status, settings.provider, bodyText);
+      let msg = errorMessage(res.status, settings.provider, bodyText, usingOwnKey());
       messages.push({role:'assistant', text: msg, error:true});
       addBubble('assistant', msg, true, true);
     } else {
@@ -640,11 +647,14 @@ function syncModelOptions(){
   modelSelect.value = p.models.includes(settings.model) ? settings.model : p.defaultModel;
 }
 function syncKeyStatus(){
-  if(settings.key){
-    keyStatus.textContent = '✓ يوجد مفتاح محفوظ في جهازك';
+  if(usingOwnKey()){
+    keyStatus.textContent = '✓ شغّال على مفتاحك الخاص المحفوظ في جهازك';
     keyStatus.className = 'key-status set';
   } else if(HAS_EMBEDDED){
-    keyStatus.textContent = '✓ التطبيق يشتغل بمفتاح مدمج — أضف مفتاحك الخاص هنا فقط لو تبي';
+    keyStatus.textContent = '✓ التطبيق جاهز — الذكاء الاصطناعي مفعّل تلقائيًا بدون أي إعداد';
+    keyStatus.className = 'key-status set';
+  } else if(settings.key){
+    keyStatus.textContent = '✓ يوجد مفتاح محفوظ في جهازك';
     keyStatus.className = 'key-status set';
   } else {
     keyStatus.textContent = 'لا يوجد مفتاح محفوظ — التطبيق ما يشتغل بدونه';
@@ -656,12 +666,13 @@ $('pickGroq').onclick = () => { settings.provider = 'groq'; settings.model = '';
 $('saveBtn').onclick = () => {
   settings.key = keyInput.value.trim();
   settings.model = modelSelect.value;
+  if(settings.key) localStorage.setItem(LS.useOwn, '1'); else localStorage.removeItem(LS.useOwn);
   saveSettings(); syncKeyStatus(); render(); closeSettings();
   toast(settings.key || HAS_EMBEDDED ? 'تم الحفظ ✓ جاهز للاستخدام' : 'تم الحفظ');
 };
 $('clearKeyBtn').onclick = () => {
-  keyInput.value = ''; settings.key = ''; saveSettings(); syncKeyStatus();
-  toast(HAS_EMBEDDED ? 'تم مسح مفتاحك — رجعنا للمفتاح المدمج' : 'تم مسح المفتاح');
+  keyInput.value = ''; settings.key = ''; localStorage.removeItem(LS.useOwn); saveSettings(); syncKeyStatus();
+  toast(HAS_EMBEDDED ? 'تم مسح مفتاحك — رجعنا للوضع التلقائي' : 'تم مسح المفتاح');
 };
 $('settingsBtn').onclick = openSettings;
 overlay.addEventListener('click', e => { if(e.target === overlay) closeSettings(); });
