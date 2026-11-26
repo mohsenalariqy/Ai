@@ -228,6 +228,15 @@ footer{
 .d-actions{margin-top:12px}
 .d-download{display:inline-block;padding:12px 28px;border-radius:24px;background:var(--navy);color:#fff;font-weight:800;font-size:15px;text-decoration:none}
 .d-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.8}
+
+/* ===== Landing pages ===== */
+.lp-frame{width:100%;height:440px;border:1px solid var(--border);border-radius:12px;background:#fff}
+.lp-actions{display:flex;flex-direction:column;gap:8px}
+.lp-publish{margin-top:0;width:100%}
+.lp-linkbox{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lp-linkbox input{flex:1;min-width:180px;border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;font-size:13px;direction:ltr;text-align:left;color:var(--navy)}
+.lp-copy{padding:10px 18px;border-radius:24px;background:#fff;border:1px solid var(--border);color:var(--gold-2);font-weight:800;font-size:13px;white-space:nowrap}
+.lp-linkbox a.lp-open{color:var(--gold-2);font-weight:800;font-size:13.5px;text-decoration:none;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -249,6 +258,7 @@ footer{
     <button class="mode-btn active" id="modeSocial">📱 سوشال ميديا</button>
     <button class="mode-btn" id="modeGoogle">🔍 تسويق جوجل</button>
     <button class="mode-btn" id="modeDesigns">🎨 التصاميم</button>
+    <button class="mode-btn" id="modeLanding">🚀 صفحة هبوط</button>
   </div>
 
   <div id="empty">
@@ -302,6 +312,43 @@ footer{
       </div>
     </div>
     <div class="d-note">التصاميم تُولّد بالذكاء الاصطناعي — النصوص العربية تُضاف فوق التصميم بدقة عالية. راجع النتيجة قبل النشر.</div>
+  </div>
+
+  <div id="landing" style="display:none">
+    <div class="d-card">
+      <div class="field" style="margin-top:0">
+        <label>اسم النشاط</label>
+        <input id="lpName" placeholder="مثال: متجر النخبة للخدمات الإلكترونية" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>نوع النشاط (اختياري)</label>
+        <input id="lpKind" placeholder="مثال: متجر إلكترونيات / مطعم / عيادة" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>وصف العرض والخدمات</label>
+        <textarea id="lpOffer" rows="3" placeholder="مثال: نوفر صيانة وبرمجة جميع الأجهزة الذكية مع ضمان، وتوصيل سريع داخل الرياض"></textarea>
+      </div>
+      <div class="field">
+        <label>رقم الواتساب (لأزرار التواصل)</label>
+        <input id="lpWa" placeholder="مثال: 0564520434" inputmode="tel" autocomplete="off">
+      </div>
+      <button class="d-generate" id="lpGen">🚀 ابنِ صفحتي</button>
+      <div class="d-status" id="lpStatus"></div>
+      <div class="d-counter" id="lpCounter">النشر مجاني ضمن الحد اليومي</div>
+    </div>
+    <div class="d-result" id="lpResult" style="display:none">
+      <iframe class="lp-frame" id="lpFrame" sandbox="allow-scripts" title="معاينة صفحة الهبوط"></iframe>
+      <div class="d-actions lp-actions">
+        <a class="d-download" id="lpDl" download="landing.html">⬇ حمّل الصفحة (HTML)</a>
+        <button class="d-generate lp-publish" id="lpPub">🌐 انشر واحصل على رابط</button>
+      </div>
+      <div class="lp-linkbox" id="lpLinkBox" style="display:none">
+        <input id="lpLink" readonly>
+        <button class="lp-copy" id="lpCopy">📋 نسخ الرابط</button>
+        <a class="lp-open" id="lpOpen" target="_blank" rel="noopener">فتح الصفحة ↗</a>
+      </div>
+    </div>
+    <div class="d-note">صفحتك تُولّد بالذكاء الاصطناعي بهوية كحلي وذهبي — راجعها قبل المشاركة. الرابط المنشور يبقى فعالًا ٣٠ يومًا.</div>
   </div>
 </main>
 
@@ -602,20 +649,23 @@ function renderChips(){
 $('modeSocial').onclick = () => setMode('social');
 $('modeGoogle').onclick = () => setMode('google');
 
-/* ---- view switching (chat <-> designs) ---- */
+/* ---- view switching (chat / designs / landing) ---- */
 function setView(v){
   localStorage.setItem('mt_view', v);
-  const isDesigns = v === 'designs';
-  $('designs').style.display = isDesigns ? 'flex' : 'none';
-  chatEl.style.display = isDesigns ? 'none' : 'flex';
-  chipsEl.style.display = isDesigns ? 'none' : 'flex';
-  emptyEl.style.display = isDesigns ? 'none' : (messages.length ? 'none' : 'block');
-  document.querySelector('footer').style.display = isDesigns ? 'none' : '';
-  $('modeDesigns').classList.toggle('active', isDesigns);
-  $('modeSocial').classList.toggle('active', !isDesigns && mode === 'social');
-  $('modeGoogle').classList.toggle('active', !isDesigns && mode === 'google');
+  const isChat = v === 'chat';
+  $('designs').style.display = v === 'designs' ? 'flex' : 'none';
+  $('landing').style.display = v === 'landing' ? 'flex' : 'none';
+  chatEl.style.display = isChat ? 'flex' : 'none';
+  chipsEl.style.display = isChat ? 'flex' : 'none';
+  emptyEl.style.display = isChat ? (messages.length ? 'none' : 'block') : 'none';
+  document.querySelector('footer').style.display = isChat ? '' : 'none';
+  $('modeDesigns').classList.toggle('active', v === 'designs');
+  $('modeLanding').classList.toggle('active', v === 'landing');
+  $('modeSocial').classList.toggle('active', isChat && mode === 'social');
+  $('modeGoogle').classList.toggle('active', isChat && mode === 'google');
 }
 $('modeDesigns').onclick = () => setView('designs');
+$('modeLanding').onclick = () => setView('landing');
 
 /* ---- markdown (safe subset: escape first, then format) ---- */
 function mdRender(src){
@@ -1018,6 +1068,129 @@ async function generateDesign(){
 }
 $('dGen').onclick = generateDesign;
 
+/* ---- landing page builder ---- */
+let lpBusy = false, lpHtml = '';
+function lpStatus(t){ $('lpStatus').textContent = t; }
+
+function lpExtractHtml(text){
+  let t = (text || '').trim().replace(/^```[a-zA-Z]*\s*/, '').replace(/```\s*$/, '').trim();
+  const start = t.search(/<!DOCTYPE|<html/i);
+  const end = t.lastIndexOf('</html>');
+  if(start >= 0 && end > start) return t.slice(start, end + 7);
+  return t;
+}
+function lpWaIntl(raw){
+  let d = (raw || '').replace(/[^\d]/g, '');
+  if(d.startsWith('00')) d = d.slice(2);
+  if(d.startsWith('0') && d.length === 10) d = '966' + d.slice(1);
+  else if(d.startsWith('5') && d.length === 9) d = '966' + d;
+  return d;
+}
+async function lpGenerate(){
+  if(lpBusy) return;
+  const name = $('lpName').value.trim();
+  const kind = $('lpKind').value.trim();
+  const offer = $('lpOffer').value.trim();
+  const wa = lpWaIntl($('lpWa').value);
+  if(!name || !offer){ toast('عبّ اسم النشاط ووصف العرض على الأقل'); return; }
+  if(!effectiveKey()){ openSettings(); toast('أضف مفتاح API المجاني أولاً'); return; }
+  if($('lpWa').value.trim() && wa.length < 9){ toast('تأكد من رقم الواتساب'); return; }
+  lpBusy = true;
+  const btn = $('lpGen'); btn.disabled = true;
+  try{
+    lpStatus('⏳ جاري كتابة محتوى صفحتك وبناؤها... (قد تستغرق حتى دقيقة)');
+    const sys = 'أنت مولّد صفحات هبوط احترافية لأنشطة تجارية سعودية. أخرج صفحة HTML كاملة في ملف واحد فقط: HTML5 مع CSS داخلي في <style> (بدون أي ملفات أو مكتبات أو صور خارجية، فقط تدرجات وأشكال CSS وإيموجي)، لغة عربية واتجاه RTL، خط Tajawal عبر رابط Google Fonts فقط، ألوان كحلي (#0b1f3a) وذهبي (#d4af37)، تصميم متجاوب للجوال أولًا وبمستوى احترافي عالٍ. الأقسام بالترتيب: شريط علوي بسيط باسم النشاط، قسم رئيسي (Hero) بعنوان تسويقي قوي وسطر وصف وزر واتساب بارز، قسم "ليش تختارنا" بثلاث إلى ست بطاقات مميزات بإيموجي، قسم نبذة قصيرة، قسم دعوة أخيرة بزر واتساب، وفوتر بسيط. أضف زر واتساب عائم ثابت أسفل الشاشة. المحتوى باللهجة السعودية البيضاء، مقنع ومرتب، بدون ذكر أي أسعار إلا إذا كتبها المستخدم صراحة في الوصف. أخرج كود HTML فقط: بدون markdown وبدون شرح وبدون ```.';
+    let usr = 'اسم النشاط: ' + name + '\nنوع النشاط: ' + (kind || 'غير محدد') + '\nوصف العرض والخدمات: ' + offer;
+    if(wa) usr += '\nرقم الواتساب: استخدم الرابط https://wa.me/' + wa + ' في كل أزرار التواصل';
+    else usr += '\nلا يوجد رقم واتساب: احذف أزرار الواتساب واكتب قسم "تواصل معنا" نصي بدلها';
+    const key = effectiveKey();
+    const models = PROVIDERS.gemini.models;
+    let html = '', lastStatus = 0;
+    for(let i = 0; i < models.length && !html; i++){
+      const mdl = models[i];
+      const url = key === '__proxy__'
+        ? PROXY_URL + '/v1beta/models/' + mdl + ':generateContent'
+        : 'https://generativelanguage.googleapis.com/v1beta/models/' + mdl + ':generateContent?key=' + encodeURIComponent(key);
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 75000);
+      let res, bodyText = '';
+      try{
+        res = await fetch(url, {method:'POST', headers:{'Content-Type':'application/json'}, signal: ctrl.signal,
+          body: JSON.stringify({system_instruction:{parts:[{text:sys}]}, contents:[{role:'user',parts:[{text:usr}]}], generationConfig:{temperature:0.7, maxOutputTokens:8192}})});
+        bodyText = await res.text();
+      }catch(e){ clearTimeout(t); lastStatus = 503; continue; }
+      clearTimeout(t);
+      lastStatus = res.status;
+      if(!res.ok){ if(res.status === 429 || res.status === 503) continue; break; }
+      let json = null;
+      try{ json = JSON.parse(bodyText); }catch(e){}
+      const out = json ? extractText('gemini', json) : '';
+      const candidate = lpExtractHtml(out);
+      if(candidate.length > 800 && /<\/html>/i.test(candidate)) html = candidate;
+    }
+    if(!html){
+      lpStatus('');
+      toast(errorMessage(lastStatus || 503, 'gemini', '', usingOwnKey()));
+      return;
+    }
+    lpHtml = html;
+    $('lpFrame').srcdoc = html;
+    const blob = new Blob([html], {type:'text/html;charset=utf-8'});
+    const dl = $('lpDl');
+    if(dl.dataset.oldUrl) URL.revokeObjectURL(dl.dataset.oldUrl);
+    const objUrl = URL.createObjectURL(blob);
+    dl.href = objUrl; dl.dataset.oldUrl = objUrl;
+    dl.download = 'landing-' + Date.now() + '.html';
+    $('lpResult').style.display = 'block';
+    $('lpLinkBox').style.display = 'none';
+    $('lpResult').scrollIntoView({behavior:'smooth', block:'start'});
+    lpStatus('');
+    toast('صفحتك جاهزة ✓ عاينها وانشرها');
+  }catch(e){
+    lpStatus('');
+    toast('صار خطأ غير متوقع — جرب مرة ثانية');
+  }finally{
+    lpBusy = false; btn.disabled = false;
+  }
+}
+$('lpGen').onclick = lpGenerate;
+
+$('lpPub').onclick = async () => {
+  if(!lpHtml || lpBusy) return;
+  lpBusy = true;
+  const btn = $('lpPub'); btn.disabled = true;
+  try{
+    lpStatus('⏳ جاري نشر صفحتك...');
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 30000);
+    let res;
+    try{
+      res = await fetch(PROXY_URL + '/page', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({html: lpHtml}), signal: ctrl.signal});
+    }catch(e){ clearTimeout(t); lpStatus(''); toast('تعذر النشر — تأكد من الاتصال وجرب مرة ثانية'); return; }
+    clearTimeout(t);
+    let json = null;
+    try{ json = await res.json(); }catch(e){}
+    if(!res.ok || !json || !json.url){
+      lpStatus('');
+      if(res.status === 429){ $('lpCounter').textContent = 'يبقى 0 صفحة اليوم'; toast('خلصت حصة اليوم المجانية للنشر — جرب بكرة'); }
+      else toast('خدمة النشر مشغولة حاليًا — جرب بعد دقيقة');
+      return;
+    }
+    if(typeof json.remaining === 'number') $('lpCounter').textContent = 'يبقى ' + json.remaining + ' صفحة اليوم';
+    $('lpLink').value = json.url;
+    $('lpOpen').href = json.url;
+    $('lpLinkBox').style.display = 'flex';
+    $('lpLinkBox').scrollIntoView({behavior:'smooth', block:'end'});
+    lpStatus('');
+    toast('تم النشر ✓ رابطك جاهز للمشاركة');
+  }finally{
+    lpBusy = false; btn.disabled = false;
+  }
+};
+$('lpCopy').onclick = () => {
+  navigator.clipboard.writeText($('lpLink').value).then(() => toast('تم نسخ الرابط ✓')).catch(() => toast('تعذر النسخ'));
+};
+
 /* ---- settings ---- */
 function openSettings(){
   keyInput.value = settings.key;
@@ -1089,7 +1262,8 @@ $('newChatBtn').onclick = () => {
   renderChips();
   render();
   if(HAS_EMBEDDED) keyHint.style.display = 'none';
-  if(localStorage.getItem('mt_view') === 'designs') setView('designs');
+  const savedView = localStorage.getItem('mt_view');
+  if(savedView === 'designs' || savedView === 'landing') setView(savedView);
   if(!effectiveKey()) setTimeout(openSettings, 600);
 })();
 }
