@@ -540,7 +540,7 @@ function buildRequest(provider, model, apiKey, systemPrompt, messages, proxyUrl,
       url: base,
       options: {
         method: 'POST',
-        headers: apiKey === '__proxy__' ? {'Content-Type': 'application/json', 'x-mt-uid': MT_UID} : {'Content-Type': 'application/json'},
+        headers: apiKey === '__proxy__' ? {'Content-Type': 'application/json', 'x-mt-uid': (typeof window !== 'undefined' && window.MT_UID) || ''} : {'Content-Type': 'application/json'},
         body: JSON.stringify({
           system_instruction: {parts: [{text: systemPrompt}]},
           contents: messages.map(m => ({
@@ -612,8 +612,8 @@ const LS = {provider:'mt_provider', key:'mt_apikey', model:'mt_model', mode:'mt_
    Visitors can still add their own free key in Settings; a saved key always wins. */
 const PROXY_URL = 'https://gemini-proxy.itmamsa3.workers.dev';
 const HAS_EMBEDDED = /^https:\/\/[\w.-]+/.test(PROXY_URL) && !PROXY_URL.includes('__');
-let MT_UID = localStorage.getItem('mt_uid') || '';
-if(!MT_UID){ MT_UID = (crypto.randomUUID ? crypto.randomUUID() : 'u' + Date.now() + Math.random().toString(36).slice(2, 12)); localStorage.setItem('mt_uid', MT_UID); }
+window.MT_UID = localStorage.getItem('mt_uid') || '';
+if(!window.MT_UID){ window.MT_UID = (crypto.randomUUID ? crypto.randomUUID() : 'u' + Date.now() + Math.random().toString(36).slice(2, 12)); localStorage.setItem('mt_uid', window.MT_UID); }
 const $ = id => document.getElementById(id);
 const chatEl = $('chat'), inputEl = $('input'), sendBtn = $('send'),
       emptyEl = $('empty'), keyHint = $('keyHint'), chipsEl = $('chips'),
@@ -1068,7 +1068,7 @@ async function generateDesign(){
     const t = setTimeout(() => ctrl.abort(), 90000);
     let res;
     try{
-      res = await fetch(PROXY_URL + '/image', {method:'POST', headers:{'Content-Type':'application/json','x-mt-uid':MT_UID}, body: JSON.stringify({prompt}), signal: ctrl.signal});
+      res = await fetch(PROXY_URL + '/image', {method:'POST', headers:{'Content-Type':'application/json','x-mt-uid':window.MT_UID}, body: JSON.stringify({prompt}), signal: ctrl.signal});
     }catch(e){
       clearTimeout(t); dStatus('');
       toast('ما قدرنا نولّد التصميم — تأكد من الاتصال وجرب مرة ثانية');
@@ -1209,7 +1209,7 @@ $('lpPub').onclick = async () => {
     const t = setTimeout(() => ctrl.abort(), 30000);
     let res;
     try{
-      res = await fetch(PROXY_URL + '/page', {method:'POST', headers:{'Content-Type':'application/json','x-mt-uid':MT_UID}, body: JSON.stringify({html: lpHtml}), signal: ctrl.signal});
+      res = await fetch(PROXY_URL + '/page', {method:'POST', headers:{'Content-Type':'application/json','x-mt-uid':window.MT_UID}, body: JSON.stringify({html: lpHtml}), signal: ctrl.signal});
     }catch(e){ clearTimeout(t); lpStatus(''); toast('تعذر النشر — تأكد من الاتصال وجرب مرة ثانية'); return; }
     clearTimeout(t);
     let json = null;
@@ -1366,7 +1366,7 @@ async function crGenerate(){
     try{
       const ctrl2 = new AbortController();
       const t2 = setTimeout(() => ctrl2.abort(), 90000);
-      const res2 = await fetch(PROXY_URL + '/image', {method:'POST', headers:{'Content-Type':'application/json','x-mt-uid':MT_UID}, signal: ctrl2.signal,
+      const res2 = await fetch(PROXY_URL + '/image', {method:'POST', headers:{'Content-Type':'application/json','x-mt-uid':window.MT_UID}, signal: ctrl2.signal,
         body: JSON.stringify({prompt: 'luxury elegant abstract background for a social media carousel, deep navy blue with subtle gold geometric accents and soft light, premium minimal style, large empty center area, no text, no letters, no logos'})});
       clearTimeout(t2);
       const j2 = res2.ok ? await res2.json().catch(() => null) : null;
