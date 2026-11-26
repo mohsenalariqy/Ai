@@ -46,6 +46,7 @@ header{
 }
 header h1{font-size:19px;font-weight:800;line-height:1.2}
 header .sub{font-size:12px;color:#c9d4e6;font-weight:400}
+  .beta{display:inline-block;margin-top:3px;font-size:10px;font-weight:700;color:#d4af37;border:1px solid rgba(212,175,55,.55);border-radius:999px;padding:1px 8px;background:rgba(212,175,55,.08)}
 header .spacer{flex:1}
 .icon-btn{
   width:40px;height:40px;border-radius:10px;color:#fff;font-size:19px;
@@ -202,6 +203,7 @@ footer{
   <div>
     <h1>مساعد التسويق الذكي</h1>
     <div class="sub">محتوى سعودي لنشاطك التجاري في ثوانٍ</div>
+    <span class="beta">الإصدار التجريبي — قيد التطوير</span>
   </div>
   <div class="spacer"></div>
   <button class="icon-btn" id="newChatBtn" title="محادثة جديدة">＋</button>
@@ -436,6 +438,10 @@ if(typeof module !== 'undefined' && module.exports){
 if(typeof document !== 'undefined'){
 
 const LS = {provider:'mt_provider', key:'mt_apikey', model:'mt_model', mode:'mt_mode', chatPrefix:'mt_chat_'};
+/* Built-in default key: the app works instantly with zero setup. Visitors can still
+   add their own free key in Settings (advanced); a saved key always wins. */
+const EMBEDDED_KEY = '__GEMINI_DEFAULT_KEY__';
+const HAS_EMBEDDED = EMBEDDED_KEY !== '__GEMINI_DEFAULT_KEY__' && /^[\w.-]{20,}$/.test(EMBEDDED_KEY);
 const $ = id => document.getElementById(id);
 const chatEl = $('chat'), inputEl = $('input'), sendBtn = $('send'),
       emptyEl = $('empty'), keyHint = $('keyHint'), chipsEl = $('chips'),
@@ -470,6 +476,9 @@ function saveChat(){
 }
 function currentModel(){
   return settings.model || PROVIDERS[settings.provider].defaultModel;
+}
+function effectiveKey(){
+  return settings.key || (HAS_EMBEDDED ? EMBEDDED_KEY : '');
 }
 
 /* ---- mode switching ---- */
@@ -548,7 +557,7 @@ function toast(msg){
 async function send(){
   const text = inputEl.value.trim();
   if(!text || busy) return;
-  if(!settings.key){
+  if(!effectiveKey()){
     openSettings();
     toast('أضف مفتاح API المجاني أولاً');
     return;
@@ -560,7 +569,7 @@ async function send(){
   emptyEl.style.display = 'none';
   saveChat(); showTyping();
   try{
-    const req = buildRequest(settings.provider, currentModel(), settings.key, MODES[mode].system, messages);
+    const req = buildRequest(settings.provider, currentModel(), effectiveKey(), MODES[mode].system, messages);
     const res = await fetch(req.url, req.options);
     const bodyText = await res.text();
     if(!res.ok){
@@ -621,6 +630,9 @@ function syncKeyStatus(){
   if(settings.key){
     keyStatus.textContent = '✓ يوجد مفتاح محفوظ في جهازك';
     keyStatus.className = 'key-status set';
+  } else if(HAS_EMBEDDED){
+    keyStatus.textContent = '✓ التطبيق يشتغل بمفتاح مدمج — أضف مفتاحك الخاص هنا فقط لو تبي';
+    keyStatus.className = 'key-status set';
   } else {
     keyStatus.textContent = 'لا يوجد مفتاح محفوظ — التطبيق ما يشتغل بدونه';
     keyStatus.className = 'key-status unset';
@@ -632,11 +644,11 @@ $('saveBtn').onclick = () => {
   settings.key = keyInput.value.trim();
   settings.model = modelSelect.value;
   saveSettings(); syncKeyStatus(); render(); closeSettings();
-  toast(settings.key ? 'تم الحفظ ✓ جاهز للاستخدام' : 'تم الحفظ');
+  toast(settings.key || HAS_EMBEDDED ? 'تم الحفظ ✓ جاهز للاستخدام' : 'تم الحفظ');
 };
 $('clearKeyBtn').onclick = () => {
   keyInput.value = ''; settings.key = ''; saveSettings(); syncKeyStatus();
-  toast('تم مسح المفتاح');
+  toast(HAS_EMBEDDED ? 'تم مسح مفتاحك — رجعنا للمفتاح المدمج' : 'تم مسح المفتاح');
 };
 $('settingsBtn').onclick = openSettings;
 overlay.addEventListener('click', e => { if(e.target === overlay) closeSettings(); });
@@ -657,7 +669,8 @@ $('newChatBtn').onclick = () => {
   inputEl.placeholder = M.placeholder;
   renderChips();
   render();
-  if(!settings.key) setTimeout(openSettings, 600);
+  if(HAS_EMBEDDED) keyHint.style.display = 'none';
+  if(!effectiveKey()) setTimeout(openSettings, 600);
 })();
 }
 </script>
