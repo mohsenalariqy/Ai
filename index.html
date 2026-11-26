@@ -573,9 +573,18 @@ async function send(){
   emptyEl.style.display = 'none';
   saveChat(); showTyping();
   try{
-    const req = buildRequest(settings.provider, currentModel(), effectiveKey(), MODES[mode].system, messages, PROXY_URL);
-    const res = await fetch(req.url, req.options);
-    const bodyText = await res.text();
+    // Automatic model fallback: on quota/overload (429/503) try the next models in the list.
+    const modelList = PROVIDERS[settings.provider].models;
+    const startIdx = Math.max(0, modelList.indexOf(currentModel()));
+    let res = null, bodyText = '', lastStatus = 0;
+    for(let attempt = 0; attempt < modelList.length - startIdx && attempt < 4; attempt++){
+      const mdl = modelList[startIdx + attempt];
+      const req = buildRequest(settings.provider, mdl, effectiveKey(), MODES[mode].system, messages, PROXY_URL);
+      res = await fetch(req.url, req.options);
+      bodyText = await res.text();
+      lastStatus = res.status;
+      if(res.ok || (res.status !== 429 && res.status !== 503)) break;
+    }
     if(!res.ok){
       let msg = errorMessage(res.status, settings.provider, bodyText);
       messages.push({role:'assistant', text: msg, error:true});
