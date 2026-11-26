@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>مساعد التسويق الذكي</title>
+<meta name="description" content="مساعد تسويق بالذكاء الاصطناعي للأنشطة التجارية السعودية: منشورات، أفكار ريلز، وخطط محتوى باللهجة السعودية.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0b1f3a; --navy-2:#12294b; --navy-3:#1a3560;
+  --gold:#d4af37; --gold-2:#b9952e;
+  --bg:#f6f4ee; --card:#ffffff; --ink:#1c2733; --muted:#6b7686;
+  --border:#e6e1d4; --danger:#b23b3b; --ok:#2e7d4f;
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Tajawal',system-ui,-apple-system,'Segoe UI',sans-serif;
+  background:var(--bg); color:var(--ink);
+  min-height:100dvh; display:flex; flex-direction:column;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,textarea,select{font-family:inherit}
+
+/* ===== Header ===== */
+header{
+  background:linear-gradient(135deg,var(--navy),var(--navy-2));
+  color:#fff; padding:14px 16px;
+  display:flex; align-items:center; gap:12px;
+  position:sticky; top:0; z-index:20;
+  border-bottom:2px solid var(--gold);
+}
+.logo{
+  width:42px;height:42px;border-radius:12px;flex:0 0 auto;
+  background:linear-gradient(135deg,var(--gold),var(--gold-2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;color:var(--navy);font-weight:800;
+  box-shadow:0 2px 8px rgba(0,0,0,.25);
+}
+header h1{font-size:19px;font-weight:800;line-height:1.2}
+header .sub{font-size:12px;color:#c9d4e6;font-weight:400}
+header .spacer{flex:1}
+.icon-btn{
+  width:40px;height:40px;border-radius:10px;color:#fff;font-size:19px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.08);transition:background .15s;
+}
+.icon-btn:hover{background:rgba(255,255,255,.18)}
+
+/* ===== Chat area ===== */
+main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:16px 14px 8px;display:flex;flex-direction:column;gap:14px}
+#chat{display:flex;flex-direction:column;gap:12px}
+
+.msg{max-width:88%;padding:12px 14px;border-radius:var(--radius);line-height:1.8;font-size:15.5px;white-space:pre-wrap;word-break:break-word;position:relative;animation:pop .18s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.msg.user{
+  align-self:flex-start;
+  background:linear-gradient(135deg,var(--navy),var(--navy-3));
+  color:#fff;border-bottom-left-radius:4px;
+}
+.msg.bot{
+  align-self:flex-end;
+  background:var(--card);border:1px solid var(--border);
+  border-top:3px solid var(--gold);
+  border-bottom-right-radius:4px;
+  box-shadow:0 1px 4px rgba(11,31,58,.06);
+}
+.msg.bot .copy-btn{
+  display:inline-flex;align-items:center;gap:5px;margin-top:8px;
+  font-size:12.5px;color:var(--gold-2);font-weight:700;
+  padding:4px 10px;border:1px solid var(--border);border-radius:20px;background:#fff;
+}
+.msg.bot .copy-btn:hover{background:#fbf7ea}
+.msg.error{background:#fdf0f0;border:1px solid #ecc9c9;color:var(--danger);border-top-color:var(--danger)}
+
+.typing{align-self:flex-end;display:flex;gap:5px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);border-bottom-right-radius:4px}
+.typing span{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:blink 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+/* ===== Empty state ===== */
+#empty{
+  text-align:center;padding:34px 18px;background:var(--card);
+  border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:0 1px 4px rgba(11,31,58,.05);
+}
+#empty .big{font-size:44px;margin-bottom:8px}
+#empty h2{font-size:20px;color:var(--navy);margin-bottom:6px;font-weight:800}
+#empty p{color:var(--muted);font-size:14.5px;line-height:1.9;max-width:460px;margin:0 auto}
+#empty .key-hint{
+  margin-top:14px;display:inline-block;background:#fbf7ea;border:1px dashed var(--gold);
+  color:var(--gold-2);font-weight:700;font-size:13.5px;padding:8px 16px;border-radius:24px;
+}
+
+/* ===== Chips ===== */
+#chips{display:flex;gap:8px;overflow-x:auto;padding:4px 2px;scrollbar-width:none}
+#chips::-webkit-scrollbar{display:none}
+.chip{
+  flex:0 0 auto;padding:8px 14px;border-radius:24px;font-size:13.5px;font-weight:700;
+  background:#fff;color:var(--navy);border:1px solid var(--border);
+  transition:all .15s;white-space:nowrap;
+}
+.chip:hover{border-color:var(--gold);color:var(--gold-2);background:#fbf7ea}
+
+/* ===== Composer ===== */
+footer{
+  position:sticky;bottom:0;background:var(--bg);
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  border-top:1px solid var(--border);
+}
+.composer{max-width:760px;margin:0 auto;display:flex;gap:8px;align-items:flex-end}
+#input{
+  flex:1;resize:none;border:1.5px solid var(--border);border-radius:14px;
+  padding:12px 14px;font-size:15.5px;line-height:1.6;max-height:140px;
+  background:#fff;color:var(--ink);outline:none;transition:border-color .15s;
+}
+#input:focus{border-color:var(--gold)}
+#send{
+  width:48px;height:48px;border-radius:14px;flex:0 0 auto;
+  background:linear-gradient(135deg,var(--gold),var(--gold-2));
+  color:var(--navy);font-size:20px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 6px rgba(185,149,46,.35);transition:transform .1s;
+}
+#send:active{transform:scale(.94)}
+#send:disabled{opacity:.5;cursor:not-allowed}
+
+/* ===== Settings modal ===== */
+.overlay{
+  position:fixed;inset:0;background:rgba(11,31,58,.55);z-index:50;
+  display:none;align-items:flex-end;justify-content:center;
+}
+.overlay.open{display:flex}
+.modal{
+  background:#fff;width:100%;max-width:520px;max-height:92dvh;overflow-y:auto;
+  border-radius:20px 20px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));
+  animation:up .2s ease-out;
+}
+@media(min-width:560px){.overlay{align-items:center}.modal{border-radius:20px}}
+@keyframes up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.modal h2{color:var(--navy);font-size:19px;font-weight:800;margin-bottom:4px}
+.modal .hint{color:var(--muted);font-size:13.5px;margin-bottom:16px;line-height:1.8}
+.field{margin-bottom:14px}
+.field label{display:block;font-weight:700;font-size:14px;color:var(--navy);margin-bottom:6px}
+.field input,.field select{
+  width:100%;padding:11px 12px;border:1.5px solid var(--border);border-radius:12px;
+  font-size:15px;outline:none;background:#fff;
+}
+.field input:focus,.field select:focus{border-color:var(--gold)}
+.field input[type=password]{direction:ltr;text-align:left}
+.provider-pick{display:flex;gap:8px}
+.provider-pick button{
+  flex:1;padding:11px;border-radius:12px;border:1.5px solid var(--border);
+  font-weight:700;font-size:14.5px;color:var(--muted);background:#fff;
+}
+.provider-pick button.active{border-color:var(--gold);color:var(--navy);background:#fbf7ea}
+.guide{
+  background:#fbf7ea;border:1px solid #eadfc0;border-radius:12px;
+  padding:12px 14px;font-size:13.5px;line-height:2;color:#5b4d1e;margin-bottom:14px;
+}
+.guide a{color:var(--gold-2);font-weight:700;word-break:break-all}
+.guide ol{padding-right:18px}
+.modal .row{display:flex;gap:8px;margin-top:18px}
+.btn-primary{
+  flex:1;padding:13px;border-radius:12px;font-weight:800;font-size:15.5px;
+  background:linear-gradient(135deg,var(--navy),var(--navy-3));color:#fff;
+}
+.btn-ghost{padding:13px 16px;border-radius:12px;font-weight:700;font-size:14.5px;color:var(--muted);border:1.5px solid var(--border)}
+.key-status{font-size:12.5px;margin-top:6px}
+.key-status.set{color:var(--ok)}
+.key-status.unset{color:var(--danger)}
+
+#toast{
+  position:fixed;bottom:88px;left:50%;transform:translateX(-50%);
+  background:var(--navy);color:#fff;padding:10px 20px;border-radius:24px;
+  font-size:14px;font-weight:700;z-index:99;opacity:0;pointer-events:none;transition:opacity .2s;
+  max-width:90vw;text-align:center;
+}
+#toast.show{opacity:1}
+.footer-note{max-width:760px;margin:6px auto 0;text-align:center;font-size:11.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">✦</div>
+  <div>
+    <h1>مساعد التسويق الذكي</h1>
+    <div class="sub">محتوى سعودي لنشاطك التجاري في ثوانٍ</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="icon-btn" id="newChatBtn" title="محادثة جديدة">＋</button>
+  <button class="icon-btn" id="settingsBtn" title="الإعدادات">⚙</button>
+</header>
+
+<main>
+  <div id="empty">
+    <div class="big">✦</div>
+    <h2>وصلت للمكان الصح</h2>
+    <p>اكتب وش تحتاج لنشاطك التجاري: منشور انستجرام، فكرة ريلز، خطة محتوى أسبوعية، أو رد على عميل — وبيجيك المحتوى جاهز باللهجة السعودية.</p>
+    <span class="key-hint" id="keyHint">أول خطوة: أضف مفتاح الذكاء الاصطناعي المجاني من ⚙ الإعدادات</span>
+  </div>
+  <div id="chips"></div>
+  <div id="chat"></div>
+</main>
+
+<footer>
+  <div class="composer">
+    <textarea id="input" rows="1" placeholder="مثال: منشور انستجرام عن عروض محل حلا وتمر..."></textarea>
+    <button id="send" title="إرسال">➤</button>
+  </div>
+  <div class="footer-note">المحتوى مولّد بالذكاء الاصطناعي — راجعه قبل النشر</div>
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>الإعدادات</h2>
+    <p class="hint">التطبيق يعمل بمفتاح مجاني تحصل عليه بنفسك خلال دقيقتين. المفتاح ينحفظ في جهازك فقط وما يُرسل لأي جهة غير مزود الخدمة.</p>
+
+    <div class="field">
+      <label>مزود الذكاء الاصطناعي</label>
+      <div class="provider-pick">
+        <button id="pickGemini" class="active">Google Gemini<br><small style="font-weight:400">الأسهل والأنصح</small></button>
+        <button id="pickGroq">Groq<br><small style="font-weight:400">بديل سريع</small></button>
+      </div>
+    </div>
+
+    <div class="guide" id="guideGemini">
+      <b>طريقة الحصول على مفتاح Gemini المجاني:</b>
+      <ol>
+        <li>افتح <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com/app/apikey</a></li>
+        <li>سجل دخولك بحساب قوقل</li>
+        <li>اضغط <b>Create API key</b></li>
+        <li>انسخ المفتاح والصقه تحت</li>
+      </ol>
+    </div>
+    <div class="guide" id="guideGroq" style="display:none">
+      <b>طريقة الحصول على مفتاح Groq المجاني:</b>
+      <ol>
+        <li>افتح <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a></li>
+        <li>سجل حساب مجاني</li>
+        <li>اضغط <b>Create API Key</b></li>
+        <li>انسخ المفتاح والصقه تحت</li>
+      </ol>
+    </div>
+
+    <div class="field">
+      <label>مفتاح API</label>
+      <input type="password" id="keyInput" placeholder="الصق المفتاح هنا" autocomplete="off">
+      <div class="key-status" id="keyStatus"></div>
+    </div>
+
+    <div class="field">
+      <label>النموذج</label>
+      <select id="modelSelect"></select>
+    </div>
+
+    <div class="row">
+      <button class="btn-ghost" id="clearKeyBtn">مسح المفتاح</button>
+      <button class="btn-primary" id="saveBtn">حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ================= Configuration ================= */
+const PROVIDERS = {
+  gemini: {
+    name: 'Google Gemini',
+    models: ['gemini-2.5-flash', 'gemini-2.5-flash-lite', 'gemini-2.0-flash'],
+    defaultModel: 'gemini-2.5-flash'
+  },
+  groq: {
+    name: 'Groq',
+    models: ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'],
+    defaultModel: 'llama-3.3-70b-versatile'
+  }
+};
+
+const SYSTEM_PROMPT = [
+  'أنت "مساعد التسويق" — خبير تسويق سعودي متخصص في المحتوى للأنشطة التجارية الصغيرة والمتوسطة في السعودية.',
+  'قواعدك الثابتة:',
+  '1) اكتب دائمًا باللهجة السعودية البيضاء: قريبة وطبيعية ومفهومة، بدون مبالغة أو تصنّع.',
+  '2) لا تذكر أي أسعار أو أرقام مبالغ نهائيًا، حتى لو طلب المستخدم. الأسعار تُترك لصاحب النشاط.',
+  '3) كل منشور ينتهي بدعوة واضحة للتواصل (واتساب أو رسائل الصفحة) بدون ذكر أرقام.',
+  '4) المنشورات: عنوان جذاب، نص قصير مشوّق، إيموجي باعتدال، و5-10 هاشتاقات سعودية مناسبة في النهاية.',
+  '5) أفكار الريلز: قدّم الفكرة بمشاهد مرقمة (الهوك أول 3 ثواني، السيناريو، النص على الشاشة، الصوت/الموسيقى المقترح، ودعوة التفاعل).',
+  '6) خطط المحتوى: جدول أيام الأسبوع بنوع المحتوى وفكرته لكل يوم.',
+  '7) إذا ما ذكر المستخدم نوع نشاطه، اسأله سؤال واحد قصير عن نشاطه قبل ما تولّد المحتوى.',
+  '8) خلّ إجابتك جاهزة للنسخ والنشر مباشرة، بدون مقدمات أو شرح إضافي عن طريقتك.'
+].join('\n');
+
+const TEMPLATES = [
+  {label:'📸 منشور انستجرام', text:'اكتب لي منشور انستجرام عن: '},
+  {label:'🎬 فكرة ريلز', text:'أبغى فكرة ريلز قصيرة عن: '},
+  {label:'🗓 خطة محتوى أسبوعية', text:'سوّ لي خطة محتوى لأسبوع كامل لنشاطي: '},
+  {label:'💬 رد على عميل', text:'اكتب لي رد احترافي على عميل يقول: '},
+  {label:'#️⃣ هاشتاقات', text:'أعطني هاشتاقات مناسبة لنشاطي: '},
+  {label:'✨ اسم وشعار لفكرة', text:'اقترح لي أسماء تجارية وشعار نصي لفكرة: '}
+];
+
+/* ================= Pure logic (no DOM; unit-testable) ================= */
+function buildRequest(provider, model, apiKey, systemPrompt, messages){
+  if(provider === 'gemini'){
+    return {
+      url: 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey),
+      options: {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          system_instruction: {parts: [{text: systemPrompt}]},
+          contents: messages.map(m => ({
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts: [{text: m.text}]
+          })),
+          generationConfig: {temperature: 0.9, maxOutputTokens: 2048}
+        })
+      }
+    };
+  }
+  if(provider === 'groq'){
+    return {
+      url: 'https://api.groq.com/openai/v1/chat/completions',
+      options: {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey},
+        body: JSON.stringify({
+          model: model,
+          messages: [{role: 'system', content: systemPrompt}].concat(
+            messages.map(m => ({role: m.role, content: m.text}))
+          ),
+          temperature: 0.9,
+          max_tokens: 2048
+        })
+      }
+    };
+  }
+  throw new Error('مزود غير معروف: ' + provider);
+}
+
+function extractText(provider, json){
+  if(provider === 'gemini'){
+    const parts = json && json.candidates && json.candidates[0] &&
+      json.candidates[0].content && json.candidates[0].content.parts;
+    if(parts && parts.length){
+      return parts.map(p => p.text || '').join('').trim();
+    }
+    return '';
+  }
+  if(provider === 'groq'){
+    const c = json && json.choices && json.choices[0];
+    return (c && c.message && c.message.content || '').trim();
+  }
+  return '';
+}
+
+function errorMessage(status, provider, bodyText){
+  if(status === 400 && provider === 'gemini') return 'المفتاح غير صحيح أو غير مكتمل. تأكد من نسخه كاملًا من الإعدادات ⚙';
+  if(status === 401 || status === 403) return 'المفتاح مرفوض. تأكد أنه صحيح وفعّال من صفحة الإعدادات ⚙';
+  if(status === 429) return 'وصلت للحد المجاني مؤقتًا. انتظر دقيقة وجرب مرة ثانية.';
+  if(status >= 500) return 'خدمة الذكاء الاصطناعي مشغولة حاليًا. جرب بعد قليل.';
+  return 'صار خطأ غير متوقع (رمز ' + status + '). جرب مرة ثانية.';
+}
+
+/* ================= Export for tests ================= */
+if(typeof module !== 'undefined' && module.exports){
+  module.exports = {buildRequest, extractText, errorMessage, PROVIDERS, SYSTEM_PROMPT};
+}
+
+/* ================= App (DOM) ================= */
+if(typeof document !== 'undefined'){
+
+const LS = {provider:'mt_provider', key:'mt_apikey', model:'mt_model', chat:'mt_chat'};
+const $ = id => document.getElementById(id);
+const chatEl = $('chat'), inputEl = $('input'), sendBtn = $('send'),
+      emptyEl = $('empty'), keyHint = $('keyHint'), chipsEl = $('chips'),
+      overlay = $('overlay'), keyInput = $('keyInput'), modelSelect = $('modelSelect'),
+      keyStatus = $('keyStatus'), toastEl = $('toast');
+
+let settings = loadSettings();
+let messages = loadChat();
+let busy = false;
+
+function loadSettings(){
+  return {
+    provider: localStorage.getItem(LS.provider) || 'gemini',
+    key: localStorage.getItem(LS.key) || '',
+    model: localStorage.getItem(LS.model) || ''
+  };
+}
+function saveSettings(){
+  localStorage.setItem(LS.provider, settings.provider);
+  localStorage.setItem(LS.key, settings.key);
+  localStorage.setItem(LS.model, settings.model);
+}
+function loadChat(){
+  try{ return JSON.parse(localStorage.getItem(LS.chat) || '[]'); }catch(e){ return []; }
+}
+function saveChat(){
+  localStorage.setItem(LS.chat, JSON.stringify(messages.slice(-40)));
+}
+function currentModel(){
+  return settings.model || PROVIDERS[settings.provider].defaultModel;
+}
+
+/* ---- rendering ---- */
+function render(){
+  chatEl.innerHTML = '';
+  messages.forEach(m => addBubble(m.role, m.text, m.error, false));
+  emptyEl.style.display = messages.length ? 'none' : 'block';
+  keyHint.style.display = settings.key ? 'none' : 'inline-block';
+  chatEl.scrollIntoView(false);
+}
+function addBubble(role, text, isError, animate){
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role === 'user' ? 'user' : 'bot') + (isError ? ' error' : '');
+  div.textContent = text;
+  if(role === 'assistant' && !isError){
+    const btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = '📋 نسخ';
+    btn.onclick = () => {
+      navigator.clipboard.writeText(text).then(() => toast('تم النسخ ✓')).catch(() => toast('تعذر النسخ'));
+    };
+    div.appendChild(document.createElement('br'));
+    div.appendChild(btn);
+  }
+  chatEl.appendChild(div);
+  div.scrollIntoView({behavior: animate ? 'smooth' : 'auto', block:'end'});
+  return div;
+}
+let typingEl = null;
+function showTyping(){
+  typingEl = document.createElement('div');
+  typingEl.className = 'typing';
+  typingEl.innerHTML = '<span></span><span></span><span></span>';
+  chatEl.appendChild(typingEl);
+  typingEl.scrollIntoView({behavior:'smooth', block:'end'});
+}
+function hideTyping(){ if(typingEl){ typingEl.remove(); typingEl = null; } }
+
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add('show');
+  setTimeout(() => toastEl.classList.remove('show'), 2200);
+}
+
+/* ---- chips ---- */
+TEMPLATES.forEach(t => {
+  const b = document.createElement('button');
+  b.className = 'chip';
+  b.textContent = t.label;
+  b.onclick = () => { inputEl.value = t.text; inputEl.focus(); autoGrow(); };
+  chipsEl.appendChild(b);
+});
+
+/* ---- sending ---- */
+async function send(){
+  const text = inputEl.value.trim();
+  if(!text || busy) return;
+  if(!settings.key){
+    openSettings();
+    toast('أضف مفتاح API المجاني أولاً');
+    return;
+  }
+  busy = true; sendBtn.disabled = true;
+  inputEl.value = ''; autoGrow();
+  messages.push({role:'user', text});
+  addBubble('user', text, false, true);
+  emptyEl.style.display = 'none';
+  saveChat(); showTyping();
+  try{
+    const req = buildRequest(settings.provider, currentModel(), settings.key, SYSTEM_PROMPT, messages);
+    const res = await fetch(req.url, req.options);
+    const bodyText = await res.text();
+    if(!res.ok){
+      let msg = errorMessage(res.status, settings.provider, bodyText);
+      messages.push({role:'assistant', text: msg, error:true});
+      addBubble('assistant', msg, true, true);
+    } else {
+      let json;
+      try{ json = JSON.parse(bodyText); }catch(e){ json = null; }
+      const out = json ? extractText(settings.provider, json) : '';
+      const finalText = out || 'ما وصلني رد واضح، جرب تعيد صياغة طلبك.';
+      messages.push({role:'assistant', text: finalText});
+      addBubble('assistant', finalText, false, true);
+    }
+  }catch(err){
+    const msg = 'ما في اتصال بالإنترنت أو الخدمة. تأكد من الشبكة وجرب مرة ثانية.';
+    messages.push({role:'assistant', text: msg, error:true});
+    addBubble('assistant', msg, true, true);
+  }finally{
+    hideTyping(); busy = false; sendBtn.disabled = false; saveChat();
+  }
+}
+
+sendBtn.onclick = send;
+inputEl.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); send(); }
+});
+function autoGrow(){
+  inputEl.style.height = 'auto';
+  inputEl.style.height = Math.min(inputEl.scrollHeight, 140) + 'px';
+}
+inputEl.addEventListener('input', autoGrow);
+
+/* ---- settings ---- */
+function openSettings(){
+  keyInput.value = settings.key;
+  syncProviderUI(); syncModelOptions(); syncKeyStatus();
+  overlay.classList.add('open');
+}
+function closeSettings(){ overlay.classList.remove('open'); }
+function syncProviderUI(){
+  $('pickGemini').classList.toggle('active', settings.provider === 'gemini');
+  $('pickGroq').classList.toggle('active', settings.provider === 'groq');
+  $('guideGemini').style.display = settings.provider === 'gemini' ? 'block' : 'none';
+  $('guideGroq').style.display = settings.provider === 'groq' ? 'block' : 'none';
+}
+function syncModelOptions(){
+  const p = PROVIDERS[settings.provider];
+  modelSelect.innerHTML = '';
+  p.models.forEach(m => {
+    const o = document.createElement('option');
+    o.value = m; o.textContent = m;
+    modelSelect.appendChild(o);
+  });
+  modelSelect.value = p.models.includes(settings.model) ? settings.model : p.defaultModel;
+}
+function syncKeyStatus(){
+  if(settings.key){
+    keyStatus.textContent = '✓ يوجد مفتاح محفوظ في جهازك';
+    keyStatus.className = 'key-status set';
+  } else {
+    keyStatus.textContent = 'لا يوجد مفتاح محفوظ — التطبيق ما يشتغل بدونه';
+    keyStatus.className = 'key-status unset';
+  }
+}
+$('pickGemini').onclick = () => { settings.provider = 'gemini'; settings.model = ''; syncProviderUI(); syncModelOptions(); };
+$('pickGroq').onclick = () => { settings.provider = 'groq'; settings.model = ''; syncProviderUI(); syncModelOptions(); };
+$('saveBtn').onclick = () => {
+  settings.key = keyInput.value.trim();
+  settings.model = modelSelect.value;
+  saveSettings(); syncKeyStatus(); render(); closeSettings();
+  toast(settings.key ? 'تم الحفظ ✓ جاهز للاستخدام' : 'تم الحفظ');
+};
+$('clearKeyBtn').onclick = () => {
+  keyInput.value = ''; settings.key = ''; saveSettings(); syncKeyStatus();
+  toast('تم مسح المفتاح');
+};
+$('settingsBtn').onclick = openSettings;
+overlay.addEventListener('click', e => { if(e.target === overlay) closeSettings(); });
+
+$('newChatBtn').onclick = () => {
+  messages = []; saveChat(); render();
+  toast('محادثة جديدة');
+};
+
+/* ---- init ---- */
+render();
+if(!settings.key) setTimeout(openSettings, 600);
+}
+</script>
+</body>
+</html>
