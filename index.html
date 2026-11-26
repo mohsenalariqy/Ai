@@ -194,6 +194,40 @@ footer{
 }
 #toast.show{opacity:1}
 .footer-note{max-width:760px;margin:6px auto 0;text-align:center;font-size:11.5px;color:var(--muted)}
+
+/* ===== Markdown bubbles ===== */
+.msg.bot.md{white-space:normal}
+.msg.bot.md p{margin:0 0 8px}
+.msg.bot.md p:last-child{margin-bottom:0}
+.msg.bot.md h4{color:var(--navy);font-size:16.5px;margin:10px 0 4px;font-weight:800}
+.msg.bot.md h4:first-child{margin-top:0}
+.msg.bot.md ul,.msg.bot.md ol{margin:0 0 8px;padding-inline-start:22px}
+.msg.bot.md li{margin-bottom:3px}
+.msg.bot.md hr{border:none;border-top:1px solid var(--border);margin:8px 0}
+.msg.bot.md b{color:var(--navy)}
+
+/* ===== Designs ===== */
+#designs{display:flex;flex-direction:column;gap:14px}
+.d-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:0 1px 4px rgba(11,31,58,.05)}
+.d-title{font-weight:800;color:var(--navy);font-size:14.5px;margin:12px 0 6px}
+.d-title:first-child{margin-top:0}
+.d-presets{display:flex;gap:8px}
+.d-preset,.d-size{flex:1;padding:9px 6px;border-radius:12px;border:1.5px solid var(--border);background:#fff;font-weight:800;font-size:13.5px;color:var(--muted);line-height:1.5;transition:all .15s}
+.d-preset.active,.d-size.active{border-color:var(--gold);color:var(--navy);background:#fbf7ea}
+.d-size small{font-weight:400;color:var(--muted)}
+#designs .field{margin-top:10px}
+#designs .field input,#designs .field textarea{width:100%;border:1.5px solid var(--border);border-radius:12px;padding:10px 12px;font-size:15px;background:#fff;color:var(--ink);outline:none;resize:vertical}
+#designs .field input:focus,#designs .field textarea:focus{border-color:var(--gold)}
+.d-generate{margin-top:14px;width:100%;padding:13px;border-radius:14px;background:linear-gradient(135deg,var(--gold),var(--gold-2));color:var(--navy);font-weight:800;font-size:16px;box-shadow:0 2px 6px rgba(185,149,46,.35);transition:transform .1s}
+.d-generate:active{transform:scale(.98)}
+.d-generate:disabled{opacity:.6;cursor:not-allowed}
+.d-status{text-align:center;color:var(--gold-2);font-weight:700;font-size:13.5px;margin-top:8px;min-height:20px}
+.d-counter{margin-top:2px;text-align:center;font-size:12.5px;color:var(--muted);font-weight:700}
+.d-result{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px;text-align:center;box-shadow:0 1px 4px rgba(11,31,58,.05)}
+.d-result img{max-width:100%;border-radius:12px;border:1px solid var(--border)}
+.d-actions{margin-top:12px}
+.d-download{display:inline-block;padding:12px 28px;border-radius:24px;background:var(--navy);color:#fff;font-weight:800;font-size:15px;text-decoration:none}
+.d-note{font-size:12px;color:var(--muted);text-align:center;line-height:1.8}
 </style>
 </head>
 <body>
@@ -214,6 +248,7 @@ footer{
   <div id="modebar">
     <button class="mode-btn active" id="modeSocial">📱 سوشال ميديا</button>
     <button class="mode-btn" id="modeGoogle">🔍 تسويق جوجل</button>
+    <button class="mode-btn" id="modeDesigns">🎨 التصاميم</button>
   </div>
 
   <div id="empty">
@@ -225,6 +260,49 @@ footer{
   </div>
   <div id="chips"></div>
   <div id="chat"></div>
+
+  <div id="designs" style="display:none">
+    <div class="d-card">
+      <div class="d-title">نوع التصميم</div>
+      <div class="d-presets" id="dPresets">
+        <button class="d-preset active" data-preset="ad">📢 تصميم إعلان</button>
+        <button class="d-preset" data-preset="logo">✦ شعار</button>
+        <button class="d-preset" data-preset="product">🛍 صورة منتج</button>
+      </div>
+      <div class="d-title">المقاس</div>
+      <div class="d-presets" id="dSizes">
+        <button class="d-size active" data-size="1:1">⬜ مربع<br><small>منشور انستجرام 1:1</small></button>
+        <button class="d-size" data-size="4:5">▯ بورتريه<br><small>انستجرام 4:5</small></button>
+        <button class="d-size" data-size="9:16">📱 ستوري<br><small>9:16</small></button>
+      </div>
+      <div class="field">
+        <label>وصف التصميم (بالعربي)</label>
+        <textarea id="dDesc" rows="3" placeholder="مثال: خلفية فاخرة كحلي وذهبي لمحل خدمات إلكترونية، مع مساحة فاضية بالنص"></textarea>
+      </div>
+      <div class="field">
+        <label>اسم المتجر (اختياري)</label>
+        <input id="dStore" placeholder="مثال: متجر النخبة" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>سطر العرض (اختياري)</label>
+        <input id="dOffer" placeholder="مثال: خصم خاص لفترة محدودة" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>زر الواتساب (اختياري)</label>
+        <input id="dWa" placeholder="مثال: واتساب 0500000000" autocomplete="off">
+      </div>
+      <button class="d-generate" id="dGen">✨ ولّد التصميم</button>
+      <div class="d-status" id="dStatus"></div>
+      <div class="d-counter" id="dCounter">التصاميم مجانية ضمن الحد اليومي</div>
+    </div>
+    <div class="d-result" id="dResult" style="display:none">
+      <img id="dImg" alt="التصميم الجاهز">
+      <div class="d-actions">
+        <a class="d-download" id="dDl" download="design.png">⬇ حمّل التصميم</a>
+      </div>
+    </div>
+    <div class="d-note">التصاميم تُولّد بالذكاء الاصطناعي — النصوص العربية تُضاف فوق التصميم بدقة عالية. راجع النتيجة قبل النشر.</div>
+  </div>
 </main>
 
 <footer>
@@ -509,6 +587,7 @@ function setMode(m){
   inputEl.placeholder = M.placeholder;
   renderChips();
   render();
+  setView('chat');
 }
 function renderChips(){
   chipsEl.innerHTML = '';
@@ -523,6 +602,42 @@ function renderChips(){
 $('modeSocial').onclick = () => setMode('social');
 $('modeGoogle').onclick = () => setMode('google');
 
+/* ---- view switching (chat <-> designs) ---- */
+function setView(v){
+  localStorage.setItem('mt_view', v);
+  const isDesigns = v === 'designs';
+  $('designs').style.display = isDesigns ? 'flex' : 'none';
+  chatEl.style.display = isDesigns ? 'none' : 'flex';
+  chipsEl.style.display = isDesigns ? 'none' : 'flex';
+  emptyEl.style.display = isDesigns ? 'none' : (messages.length ? 'none' : 'block');
+  document.querySelector('footer').style.display = isDesigns ? 'none' : '';
+  $('modeDesigns').classList.toggle('active', isDesigns);
+  $('modeSocial').classList.toggle('active', !isDesigns && mode === 'social');
+  $('modeGoogle').classList.toggle('active', !isDesigns && mode === 'google');
+}
+$('modeDesigns').onclick = () => setView('designs');
+
+/* ---- markdown (safe subset: escape first, then format) ---- */
+function mdRender(src){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const inline = s => s.replace(/\*\*([^*]+)\*\*/g,'<b>$1</b>').replace(/\*([^*\n]+)\*/g,'<i>$1</i>');
+  const lines = esc(src).split('\n');
+  let html = '', inUl = false, inOl = false;
+  const close = () => { if(inUl){ html += '</ul>'; inUl = false; } if(inOl){ html += '</ol>'; inOl = false; } };
+  for(const raw of lines){
+    const t = raw.trim();
+    let m;
+    if(!t){ close(); continue; }
+    if((m = t.match(/^#{1,4}\s+(.*)/))){ close(); html += '<h4>' + inline(m[1]) + '</h4>'; continue; }
+    if(/^(-{3,}|\*{3,}|_{3,})$/.test(t)){ close(); html += '<hr>'; continue; }
+    if((m = t.match(/^[-*•]\s+(.*)/))){ if(inOl){ html += '</ol>'; inOl = false; } if(!inUl){ html += '<ul>'; inUl = true; } html += '<li>' + inline(m[1]) + '</li>'; continue; }
+    if((m = t.match(/^\d+[.)]\s+(.*)/))){ if(inUl){ html += '</ul>'; inUl = false; } if(!inOl){ html += '<ol>'; inOl = true; } html += '<li>' + inline(m[1]) + '</li>'; continue; }
+    close(); html += '<p>' + inline(raw) + '</p>';
+  }
+  close();
+  return html;
+}
+
 /* ---- rendering ---- */
 function render(){
   chatEl.innerHTML = '';
@@ -534,7 +649,12 @@ function render(){
 function addBubble(role, text, isError, animate){
   const div = document.createElement('div');
   div.className = 'msg ' + (role === 'user' ? 'user' : 'bot') + (isError ? ' error' : '');
-  div.textContent = text;
+  if(role === 'assistant' && !isError){
+    div.classList.add('md');
+    div.innerHTML = mdRender(text);
+  } else {
+    div.textContent = text;
+  }
   if(role === 'assistant' && !isError){
     const btn = document.createElement('button');
     btn.className = 'copy-btn';
@@ -582,7 +702,8 @@ function makeStreamBubble(){
   return div;
 }
 function finalizeStreamBubble(div, text){
-  div.textContent = text;
+  div.classList.add('md');
+  div.innerHTML = mdRender(text);
   const btn = document.createElement('button');
   btn.className = 'copy-btn';
   btn.textContent = '📋 نسخ';
@@ -737,6 +858,166 @@ function autoGrow(){
 }
 inputEl.addEventListener('input', autoGrow);
 
+/* ---- designs (image generation via the same worker) ---- */
+const D_SIZES = {'1:1':[1080,1080],'4:5':[1080,1350],'9:16':[1080,1920]};
+const D_PRESET_TPL = {
+  ad: 'luxurious advertising banner background for a Saudi business: {d}. Dark navy blue and gold premium style, elegant, professional, large empty space in the center for text, no text, no letters, no words, no watermark',
+  logo: 'minimal flat vector logo emblem: {d}. Gold icon on a dark navy circular badge, luxury brand style, clean, centered, plain dark navy background, no text, no letters',
+  product: 'professional product photography: {d}. Studio lighting, elegant dark navy background with subtle gold accents, commercial advertising quality, no text, no letters, no watermark'
+};
+let dPreset = 'ad', dSize = '1:1', dBusy = false;
+
+document.querySelectorAll('#dPresets .d-preset').forEach(b => b.onclick = () => {
+  dPreset = b.dataset.preset;
+  document.querySelectorAll('#dPresets .d-preset').forEach(x => x.classList.toggle('active', x === b));
+});
+document.querySelectorAll('#dSizes .d-size').forEach(b => b.onclick = () => {
+  dSize = b.dataset.size;
+  document.querySelectorAll('#dSizes .d-size').forEach(x => x.classList.toggle('active', x === b));
+});
+function dStatus(t){ $('dStatus').textContent = t; }
+
+async function enhanceDesignPrompt(desc, preset){
+  // Best-effort Arabic->English prompt enhancement via the fast Gemini model; falls back to the raw description.
+  const kind = preset === 'logo' ? 'لشعار' : preset === 'product' ? 'لصورة منتج' : 'لخلفية تصميم إعلاني';
+  const instruction = 'حوّل الوصف العربي التالي إلى برومبت إنجليزي لتوليد صورة ' + kind +
+    '. اكتب البرومبت الإنجليزي فقط بدون أي شرح، بحد أقصى 50 كلمة. الوصف: ' + desc;
+  const req = buildRequest('gemini', PROVIDERS.gemini.models[1], effectiveKey(), '', [{role:'user', text: instruction}], PROXY_URL);
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 15000);
+  try{
+    const res = await fetch(req.url, {...req.options, signal: ctrl.signal});
+    clearTimeout(t);
+    if(!res.ok) return desc;
+    const out = extractText('gemini', await res.json());
+    return out && out.length > 10 ? out.slice(0, 400) : desc;
+  }catch(e){ clearTimeout(t); return desc; }
+}
+
+function dRoundRect(x, a, b, w, h, r){
+  x.beginPath(); x.moveTo(a + r, b);
+  x.arcTo(a + w, b, a + w, b + h, r); x.arcTo(a + w, b + h, a, b + h, r);
+  x.arcTo(a, b + h, a, b, r); x.arcTo(a, b, a + w, b, r);
+  x.closePath();
+}
+function dWrapText(x, text, cx, lastLineY, maxW, lineH){
+  const words = text.split(/\s+/); const lines = []; let cur = '';
+  for(const w of words){
+    const t = cur ? cur + ' ' + w : w;
+    if(cur && x.measureText(t).width > maxW){ lines.push(cur); cur = w; } else cur = t;
+  }
+  if(cur) lines.push(cur);
+  const startY = lastLineY - (lines.length - 1) * lineH;
+  lines.forEach((ln, i) => x.fillText(ln, cx, startY + i * lineH));
+}
+async function composeDesign(base64, opts){
+  const dims = D_SIZES[opts.size] || D_SIZES['1:1'];
+  const W = dims[0], H = dims[1];
+  const img = await new Promise((res, rej) => {
+    const i = new Image();
+    i.onload = () => res(i); i.onerror = rej;
+    i.src = 'data:image/jpeg;base64,' + base64;
+  });
+  try{ await Promise.all([document.fonts.load('800 60px Tajawal'), document.fonts.load('700 44px Tajawal'), document.fonts.ready]); }catch(e){}
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const x = c.getContext('2d');
+  const s = Math.max(W / img.width, H / img.height);
+  const dw = img.width * s, dh = img.height * s;
+  x.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
+  const pad = Math.round(W * 0.05);
+  if(opts.offer || opts.wa){
+    const g = x.createLinearGradient(0, H * 0.45, 0, H);
+    g.addColorStop(0, 'rgba(11,31,58,0)'); g.addColorStop(1, 'rgba(11,31,58,0.82)');
+    x.fillStyle = g; x.fillRect(0, H * 0.45, W, H * 0.55);
+  }
+  x.direction = 'rtl'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  if(opts.store){
+    const g2 = x.createLinearGradient(0, 0, 0, H * 0.28);
+    g2.addColorStop(0, 'rgba(11,31,58,0.75)'); g2.addColorStop(1, 'rgba(11,31,58,0)');
+    x.fillStyle = g2; x.fillRect(0, 0, W, H * 0.28);
+    x.fillStyle = '#d4af37';
+    x.font = '800 ' + Math.round(W * 0.062) + 'px Tajawal';
+    x.fillText(opts.store, W / 2, pad + Math.round(W * 0.045));
+  }
+  const waH = opts.wa ? Math.round(H * 0.055) : 0;
+  if(opts.offer){
+    x.fillStyle = '#ffffff';
+    x.font = '800 ' + Math.round(W * 0.072) + 'px Tajawal';
+    const lastLineY = H - pad - waH - (opts.wa ? Math.round(H * 0.035) : Math.round(H * 0.045));
+    dWrapText(x, opts.offer, W / 2, lastLineY, W - pad * 2, Math.round(W * 0.088));
+  }
+  if(opts.wa){
+    const bw = Math.min(W - pad * 2, Math.round(W * 0.74));
+    const bx = (W - bw) / 2, by = H - pad - waH;
+    dRoundRect(x, bx, by, bw, waH, waH / 2);
+    x.fillStyle = '#d4af37'; x.fill();
+    x.fillStyle = '#0b1f3a';
+    x.font = '800 ' + Math.round(waH * 0.42) + 'px Tajawal';
+    x.fillText(opts.wa, W / 2, by + waH / 2 + 2);
+  }
+  return c.toDataURL('image/png');
+}
+
+async function generateDesign(){
+  if(dBusy) return;
+  const desc = $('dDesc').value.trim();
+  if(!desc){ toast('اكتب وصف التصميم أولاً'); $('dDesc').focus(); return; }
+  if(!effectiveKey()){ openSettings(); toast('أضف مفتاح API المجاني أولاً'); return; }
+  dBusy = true;
+  const btn = $('dGen'); btn.disabled = true;
+  try{
+    dStatus('⏳ جاري تجهيز الوصف الاحترافي...');
+    const enhanced = await enhanceDesignPrompt(desc, dPreset);
+    const prompt = D_PRESET_TPL[dPreset].replace('{d}', enhanced).slice(0, 1100);
+    dStatus('🎨 جاري توليد التصميم...');
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 90000);
+    let res;
+    try{
+      res = await fetch(PROXY_URL + '/image', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({prompt}), signal: ctrl.signal});
+    }catch(e){
+      clearTimeout(t); dStatus('');
+      toast('ما قدرنا نولّد التصميم — تأكد من الاتصال وجرب مرة ثانية');
+      return;
+    }
+    clearTimeout(t);
+    let json = null;
+    try{ json = await res.json(); }catch(e){}
+    if(!res.ok || !json || !json.image){
+      dStatus('');
+      if(res.status === 429){
+        $('dCounter').textContent = 'يبقى 0 تصميم اليوم';
+        toast('خلصت حصة اليوم المجانية للتصاميم — جرب بكرة');
+      } else {
+        toast('خدمة التصاميم مشغولة حاليًا — جرب بعد دقيقة');
+      }
+      return;
+    }
+    if(typeof json.remaining === 'number') $('dCounter').textContent = 'يبقى ' + json.remaining + ' تصميم اليوم';
+    dStatus('✍️ جاري إضافة النصوص بالعربي...');
+    const dataUrl = await composeDesign(json.image, {
+      size: dSize,
+      store: $('dStore').value.trim(),
+      offer: $('dOffer').value.trim(),
+      wa: $('dWa').value.trim()
+    });
+    $('dImg').src = dataUrl;
+    const dl = $('dDl');
+    dl.href = dataUrl;
+    dl.download = 'design-' + dPreset + '-' + Date.now() + '.png';
+    $('dResult').style.display = 'block';
+    $('dResult').scrollIntoView({behavior:'smooth', block:'start'});
+    dStatus('');
+    toast('التصميم جاهز ✓');
+  }catch(e){
+    dStatus('');
+    toast('صار خطأ غير متوقع — جرب مرة ثانية');
+  }finally{
+    dBusy = false; btn.disabled = false;
+  }
+}
+$('dGen').onclick = generateDesign;
+
 /* ---- settings ---- */
 function openSettings(){
   keyInput.value = settings.key;
@@ -808,6 +1089,7 @@ $('newChatBtn').onclick = () => {
   renderChips();
   render();
   if(HAS_EMBEDDED) keyHint.style.display = 'none';
+  if(localStorage.getItem('mt_view') === 'designs') setView('designs');
   if(!effectiveKey()) setTimeout(openSettings, 600);
 })();
 }
