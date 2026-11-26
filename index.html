@@ -366,10 +366,13 @@ const MODES = {
 };
 
 /* ================= Pure logic (no DOM; unit-testable) ================= */
-function buildRequest(provider, model, apiKey, systemPrompt, messages){
+function buildRequest(provider, model, apiKey, systemPrompt, messages, proxyUrl){
   if(provider === 'gemini'){
+    const base = apiKey === '__proxy__'
+      ? proxyUrl + '/v1beta/models/' + model + ':generateContent'
+      : 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey);
     return {
-      url: 'https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent?key=' + encodeURIComponent(apiKey),
+      url: base,
       options: {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
@@ -438,10 +441,11 @@ if(typeof module !== 'undefined' && module.exports){
 if(typeof document !== 'undefined'){
 
 const LS = {provider:'mt_provider', key:'mt_apikey', model:'mt_model', mode:'mt_mode', chatPrefix:'mt_chat_'};
-/* Built-in default key: the app works instantly with zero setup. Visitors can still
-   add their own free key in Settings (advanced); a saved key always wins. */
-const EMBEDDED_KEY = '__GEMINI_DEFAULT_KEY__';
-const HAS_EMBEDDED = EMBEDDED_KEY !== '__GEMINI_DEFAULT_KEY__' && /^[\w.-]{20,}$/.test(EMBEDDED_KEY);
+/* Zero-setup: requests go through a Cloudflare Worker proxy that holds the Gemini
+   key as a server-side secret (never in this file) and only answers our domain.
+   Visitors can still add their own free key in Settings; a saved key always wins. */
+const PROXY_URL = 'https://gemini-proxy.itmamsa3.workers.dev';
+const HAS_EMBEDDED = /^https:\/\/[\w.-]+/.test(PROXY_URL) && !PROXY_URL.includes('__');
 const $ = id => document.getElementById(id);
 const chatEl = $('chat'), inputEl = $('input'), sendBtn = $('send'),
       emptyEl = $('empty'), keyHint = $('keyHint'), chipsEl = $('chips'),
@@ -478,7 +482,7 @@ function currentModel(){
   return settings.model || PROVIDERS[settings.provider].defaultModel;
 }
 function effectiveKey(){
-  return settings.key || (HAS_EMBEDDED ? EMBEDDED_KEY : '');
+  return settings.key || (HAS_EMBEDDED ? '__proxy__' : '');
 }
 
 /* ---- mode switching ---- */
@@ -569,7 +573,7 @@ async function send(){
   emptyEl.style.display = 'none';
   saveChat(); showTyping();
   try{
-    const req = buildRequest(settings.provider, currentModel(), effectiveKey(), MODES[mode].system, messages);
+    const req = buildRequest(settings.provider, currentModel(), effectiveKey(), MODES[mode].system, messages, PROXY_URL);
     const res = await fetch(req.url, req.options);
     const bodyText = await res.text();
     if(!res.ok){
