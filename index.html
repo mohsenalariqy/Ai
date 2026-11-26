@@ -7,7 +7,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>مساعد التسويق الذكي</title>
-<meta name="description" content="مساعد تسويق بالذكاء الاصطناعي للأنشطة التجارية السعودية: منشورات، أفكار ريلز، وخطط محتوى باللهجة السعودية.">
+<meta name="description" content="مساعد تسويق بالذكاء الاصطناعي للأنشطة التجارية السعودية: محتوى سوشال ميديا وتسويق جوجل باللهجة السعودية.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap&v=2" rel="stylesheet">
@@ -53,6 +53,14 @@ header .spacer{flex:1}
   background:rgba(255,255,255,.08);transition:background .15s;
 }
 .icon-btn:hover{background:rgba(255,255,255,.18)}
+
+/* ===== Mode bar ===== */
+#modebar{display:flex;gap:8px}
+.mode-btn{
+  flex:1;padding:10px 8px;border-radius:12px;border:1.5px solid var(--border);
+  background:#fff;font-weight:800;font-size:14.5px;color:var(--muted);transition:all .15s;
+}
+.mode-btn.active{border-color:var(--gold);color:var(--navy);background:#fbf7ea;box-shadow:0 1px 4px rgba(185,149,46,.2)}
 
 /* ===== Chat area ===== */
 main{flex:1;width:100%;max-width:760px;margin:0 auto;padding:16px 14px 8px;display:flex;flex-direction:column;gap:14px}
@@ -201,10 +209,15 @@ footer{
 </header>
 
 <main>
+  <div id="modebar">
+    <button class="mode-btn active" id="modeSocial">📱 سوشال ميديا</button>
+    <button class="mode-btn" id="modeGoogle">🔍 تسويق جوجل</button>
+  </div>
+
   <div id="empty">
-    <div class="big">✦</div>
-    <h2>وصلت للمكان الصح</h2>
-    <p>اكتب وش تحتاج لنشاطك التجاري: منشور انستجرام، فكرة ريلز، خطة محتوى أسبوعية، أو رد على عميل — وبيجيك المحتوى جاهز باللهجة السعودية.</p>
+    <div class="big" id="emptyIcon">✦</div>
+    <h2 id="emptyTitle">وصلت للمكان الصح</h2>
+    <p id="emptyText">اكتب وش تحتاج لنشاطك التجاري: منشور انستجرام، فكرة ريلز، خطة محتوى أسبوعية، أو رد على عميل — وبيجيك المحتوى جاهز باللهجة السعودية.</p>
     <span class="key-hint" id="keyHint">أول خطوة: أضف مفتاح الذكاء الاصطناعي المجاني من ⚙ الإعدادات</span>
     <br><a href="guide.html" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;color:var(--gold-2);font-weight:700;font-size:13.5px">📖 دليل البداية خطوة بخطوة</a>
   </div>
@@ -214,7 +227,7 @@ footer{
 
 <footer>
   <div class="composer">
-    <textarea id="input" rows="1" placeholder="مثال: منشور انستجرام عن عروض محل حلا وتمر..."></textarea>
+    <textarea id="input" rows="1" placeholder="اكتب طلبك هنا..."></textarea>
     <button id="send" title="إرسال">➤</button>
   </div>
   <div class="footer-note">المحتوى مولّد بالذكاء الاصطناعي — راجعه قبل النشر</div>
@@ -288,7 +301,7 @@ const PROVIDERS = {
   }
 };
 
-const SYSTEM_PROMPT = [
+const SOCIAL_SYSTEM = [
   'أنت "مساعد التسويق" — خبير تسويق سعودي متخصص في المحتوى للأنشطة التجارية الصغيرة والمتوسطة في السعودية.',
   'قواعدك الثابتة:',
   '1) اكتب دائمًا باللهجة السعودية البيضاء: قريبة وطبيعية ومفهومة، بدون مبالغة أو تصنّع.',
@@ -301,14 +314,54 @@ const SYSTEM_PROMPT = [
   '8) خلّ إجابتك جاهزة للنسخ والنشر مباشرة، بدون مقدمات أو شرح إضافي عن طريقتك.'
 ].join('\n');
 
-const TEMPLATES = [
-  {label:'📸 منشور انستجرام', text:'اكتب لي منشور انستجرام عن: '},
-  {label:'🎬 فكرة ريلز', text:'أبغى فكرة ريلز قصيرة عن: '},
-  {label:'🗓 خطة محتوى أسبوعية', text:'سوّ لي خطة محتوى لأسبوع كامل لنشاطي: '},
-  {label:'💬 رد على عميل', text:'اكتب لي رد احترافي على عميل يقول: '},
-  {label:'#️⃣ هاشتاقات', text:'أعطني هاشتاقات مناسبة لنشاطي: '},
-  {label:'✨ اسم وشعار لفكرة', text:'اقترح لي أسماء تجارية وشعار نصي لفكرة: '}
-];
+const GOOGLE_SYSTEM = [
+  'أنت "مساعد جوجل للتسويق" — خبير تسويق سعودي متخصص في كل منتجات جوجل للأنشطة التجارية: الظهور في البحث (SEO)، إعلانات جوجل، ملف النشاط التجاري على خرائط جوجل، Google Merchant Center، Search Console، Google Analytics، يوتيوب، والميزانيات الإعلانية.',
+  'قواعدك الثابتة:',
+  '1) اكتب باللهجة السعودية البيضاء: قريبة وواضحة، بمصطلحات بسيطة يفهمها صاحب أي نشاط، واشرح أي مصطلح إنجليزي بقوسين أول مرة.',
+  '2) افهم طلب العميل مهما كان عاميًا ("أبغى متجري ترند"، "أبغى أتصدر البحث") وحدد هدفه وأعطه الحل المناسب مباشرة.',
+  '3) كل ما يتسلّم فورًا، جهّزه كاملًا وجاهز للاستخدام: خطة سيو، قائمة كلمات مفتاحية بالعربي والإنجليزي، نصوص إعلانات جوجل (عناوين حتى 30 حرفًا وأوصاف حتى 90 حرفًا)، خطة ميزانية بالريال السعودي، خطة محتوى يوتيوب، نص وصف النشاط التجاري.',
+  '4) ما يحتاج حساب العميل عند جوجل (تسجيل النشاط في الخرائط وتوثيقه، ربط Search Console أو Analytics، إنشاء حساب إعلاني، رفع المنتجات لـ Merchant Center): أعطه خطوات مرقمة يتبعها بنفسه من جواله، خطوة خطوة، مع اسم كل زر وصفحة بالضبط كما تظهر له، ورابط كل خدمة.',
+  '5) إذا نقصك شيء أساسي (نوع النشاط أو المدينة)، اسأل سؤالًا واحدًا قصيرًا فقط ثم أكمل.',
+  '6) الأرقام والميزانيات المقترحة أمثلة توضيحية قابلة للتعديل — وضّح هذا للعميل بجملة قصيرة.',
+  '7) إجابتك عملية وجاهزة للتنفيذ مباشرة، بدون مقدمات أو كلام عام عن أهمية التسويق.'
+].join('\n');
+
+const MODES = {
+  social: {
+    label: '📱 سوشال ميديا',
+    emptyIcon: '✦',
+    emptyTitle: 'وصلت للمكان الصح',
+    emptyText: 'اكتب وش تحتاج لنشاطك التجاري: منشور انستجرام، فكرة ريلز، خطة محتوى أسبوعية، أو رد على عميل — وبيجيك المحتوى جاهز باللهجة السعودية.',
+    placeholder: 'مثال: منشور انستجرام عن عروض محل حلا وتمر...',
+    system: SOCIAL_SYSTEM,
+    chips: [
+      {label:'📸 منشور انستجرام', text:'اكتب لي منشور انستجرام عن: '},
+      {label:'🎬 فكرة ريلز', text:'أبغى فكرة ريلز قصيرة عن: '},
+      {label:'🗓 خطة محتوى أسبوعية', text:'سوّ لي خطة محتوى لأسبوع كامل لنشاطي: '},
+      {label:'💬 رد على عميل', text:'اكتب لي رد احترافي على عميل يقول: '},
+      {label:'#️⃣ هاشتاقات', text:'أعطني هاشتاقات مناسبة لنشاطي: '},
+      {label:'✨ اسم وشعار لفكرة', text:'اقترح لي أسماء تجارية وشعار نصي لفكرة: '}
+    ]
+  },
+  google: {
+    label: '🔍 تسويق جوجل',
+    emptyIcon: '🔍',
+    emptyTitle: 'مساعد جوجل للتسويق',
+    emptyText: 'اكتب هدفك بكلامك العادي: "أبغى أتصدر نتائج البحث"، "أبغى متجري على الخريطة"، "أبغى إعلان يجيب لي عملاء" — وبيجهز لك الخطة كاملة أو يمشي معك خطوة خطوة.',
+    placeholder: 'مثال: متجري أبغاه يتصدر نتائج البحث...',
+    system: GOOGLE_SYSTEM,
+    chips: [
+      {label:'🔍 أتصدر نتائج البحث', text:'سوّ لي خطة سيو (SEO) كاملة مع كلمات مفتاحية لنشاطي: '},
+      {label:'📍 نشاطي على الخريطة', text:'علّمني خطوة بخطوة كيف أسجل نشاطي في خرائط جوجل وأوثقه: '},
+      {label:'📢 إعلان جوجل جاهز', text:'اكتب لي إعلان جوجل كامل (عناوين وأوصاف وكلمات مفتاحية) لنشاطي: '},
+      {label:'💰 خطة ميزانية إعلانية', text:'سوّ لي خطة ميزانية إعلانات جوجل بالريال لنشاطي: '},
+      {label:'📊 Analytics وSearch Console', text:'علّمني خطوة بخطوة كيف أربط موقعي بـ Google Analytics و Search Console: '},
+      {label:'🛒 منتجاتي في Merchant Center', text:'علّمني خطوة بخطوة كيف أعرض منتجات متجري في Google Merchant Center: '},
+      {label:'▶️ قناة يوتيوب', text:'سوّ لي خطة قناة يوتيوب لنشاطي مع أفكار أول 10 فيديوهات: '},
+      {label:'📈 أبغى متجري ترند', text:'سوّ لي خطة انتشار تجيب ترافيك وعملاء لنشاطي: '}
+    ]
+  }
+};
 
 /* ================= Pure logic (no DOM; unit-testable) ================= */
 function buildRequest(provider, model, apiKey, systemPrompt, messages){
@@ -376,13 +429,13 @@ function errorMessage(status, provider, bodyText){
 
 /* ================= Export for tests ================= */
 if(typeof module !== 'undefined' && module.exports){
-  module.exports = {buildRequest, extractText, errorMessage, PROVIDERS, SYSTEM_PROMPT};
+  module.exports = {buildRequest, extractText, errorMessage, PROVIDERS, MODES};
 }
 
 /* ================= App (DOM) ================= */
 if(typeof document !== 'undefined'){
 
-const LS = {provider:'mt_provider', key:'mt_apikey', model:'mt_model', chat:'mt_chat'};
+const LS = {provider:'mt_provider', key:'mt_apikey', model:'mt_model', mode:'mt_mode', chatPrefix:'mt_chat_'};
 const $ = id => document.getElementById(id);
 const chatEl = $('chat'), inputEl = $('input'), sendBtn = $('send'),
       emptyEl = $('empty'), keyHint = $('keyHint'), chipsEl = $('chips'),
@@ -390,7 +443,8 @@ const chatEl = $('chat'), inputEl = $('input'), sendBtn = $('send'),
       keyStatus = $('keyStatus'), toastEl = $('toast');
 
 let settings = loadSettings();
-let messages = loadChat();
+let mode = localStorage.getItem(LS.mode) === 'google' ? 'google' : 'social';
+let messages = loadChat(mode);
 let busy = false;
 
 function loadSettings(){
@@ -408,15 +462,45 @@ function saveSettings(){
   localStorage.setItem(LS.key, settings.key);
   localStorage.setItem(LS.model, settings.model);
 }
-function loadChat(){
-  try{ return JSON.parse(localStorage.getItem(LS.chat) || '[]'); }catch(e){ return []; }
+function loadChat(m){
+  try{ return JSON.parse(localStorage.getItem(LS.chatPrefix + m) || '[]'); }catch(e){ return []; }
 }
 function saveChat(){
-  localStorage.setItem(LS.chat, JSON.stringify(messages.slice(-40)));
+  localStorage.setItem(LS.chatPrefix + mode, JSON.stringify(messages.slice(-40)));
 }
 function currentModel(){
   return settings.model || PROVIDERS[settings.provider].defaultModel;
 }
+
+/* ---- mode switching ---- */
+function setMode(m){
+  if(m === mode) return;
+  saveChat();
+  mode = m;
+  localStorage.setItem(LS.mode, m);
+  messages = loadChat(m);
+  $('modeSocial').classList.toggle('active', m === 'social');
+  $('modeGoogle').classList.toggle('active', m === 'google');
+  const M = MODES[m];
+  $('emptyIcon').textContent = M.emptyIcon;
+  $('emptyTitle').textContent = M.emptyTitle;
+  $('emptyText').textContent = M.emptyText;
+  inputEl.placeholder = M.placeholder;
+  renderChips();
+  render();
+}
+function renderChips(){
+  chipsEl.innerHTML = '';
+  MODES[mode].chips.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = t.label;
+    b.onclick = () => { inputEl.value = t.text; inputEl.focus(); autoGrow(); };
+    chipsEl.appendChild(b);
+  });
+}
+$('modeSocial').onclick = () => setMode('social');
+$('modeGoogle').onclick = () => setMode('google');
 
 /* ---- rendering ---- */
 function render(){
@@ -460,15 +544,6 @@ function toast(msg){
   setTimeout(() => toastEl.classList.remove('show'), 2200);
 }
 
-/* ---- chips ---- */
-TEMPLATES.forEach(t => {
-  const b = document.createElement('button');
-  b.className = 'chip';
-  b.textContent = t.label;
-  b.onclick = () => { inputEl.value = t.text; inputEl.focus(); autoGrow(); };
-  chipsEl.appendChild(b);
-});
-
 /* ---- sending ---- */
 async function send(){
   const text = inputEl.value.trim();
@@ -485,7 +560,7 @@ async function send(){
   emptyEl.style.display = 'none';
   saveChat(); showTyping();
   try{
-    const req = buildRequest(settings.provider, currentModel(), settings.key, SYSTEM_PROMPT, messages);
+    const req = buildRequest(settings.provider, currentModel(), settings.key, MODES[mode].system, messages);
     const res = await fetch(req.url, req.options);
     const bodyText = await res.text();
     if(!res.ok){
@@ -572,8 +647,18 @@ $('newChatBtn').onclick = () => {
 };
 
 /* ---- init ---- */
-render();
-if(!settings.key) setTimeout(openSettings, 600);
+(function init(){
+  const M = MODES[mode];
+  $('modeSocial').classList.toggle('active', mode === 'social');
+  $('modeGoogle').classList.toggle('active', mode === 'google');
+  $('emptyIcon').textContent = M.emptyIcon;
+  $('emptyTitle').textContent = M.emptyTitle;
+  $('emptyText').textContent = M.emptyText;
+  inputEl.placeholder = M.placeholder;
+  renderChips();
+  render();
+  if(!settings.key) setTimeout(openSettings, 600);
+})();
 }
 </script>
 </body>
