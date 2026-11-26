@@ -440,7 +440,7 @@ if(typeof document !== 'undefined'){
 const LS = {provider:'mt_provider', key:'mt_apikey', model:'mt_model', mode:'mt_mode', chatPrefix:'mt_chat_'};
 /* Built-in default key: the app works instantly with zero setup. Visitors can still
    add their own free key in Settings (advanced); a saved key always wins. */
-const EMBEDDED_KEY = 'AQ.Ab8RN6I-3TLW2DHeOUt9MbQZttiECkHTFDNJwjxG_DvKHcQRGg';
+const EMBEDDED_KEY = '__GEMINI_DEFAULT_KEY__';
 const HAS_EMBEDDED = EMBEDDED_KEY !== '__GEMINI_DEFAULT_KEY__' && /^[\w.-]{20,}$/.test(EMBEDDED_KEY);
 const $ = id => document.getElementById(id);
 const chatEl = $('chat'), inputEl = $('input'), sendBtn = $('send'),
